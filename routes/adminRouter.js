@@ -19,12 +19,12 @@ router.get("/",isSessionAdmin,adminAuth,adminController.loadDashboard);
 router.get("/logout",adminController.logout);
 
 
-//custm mngnt
+//customer management
 router.get("/users",isSessionAdmin,adminAuth,customerController.customerInfo);
 router.get("/blockCustomer",adminAuth,customerController.customerBlocked);
 router.get("/unblockCustomer",adminAuth,customerController.customerunBlocked);
 
-//cat mngnt
+//category management
 router.get("/category",isSessionAdmin,adminAuth,categoryController.categoryInfo);
 router.post("/addCategory",isSessionAdmin,adminAuth,categoryController.addCategory);
 router.post("/addCategoryOffer",adminAuth,categoryController.addCategoryOffer);
@@ -35,7 +35,7 @@ router.get("/editCategory",adminAuth,categoryController.getEditCategory);
 router.post("/editCategory/:id",adminAuth,categoryController.editCategory);
 
 
-//bran mngnt
+//brand management
 router.get("/brands",isSessionAdmin,adminAuth,brandController.getBrandPage);
 router.post("/addBrand",adminAuth,uploads.single("image"),brandController.addBrand);
 router.get("/blockBrand",adminAuth,brandController.blockBrand);
@@ -43,7 +43,7 @@ router.get("/unblockBrand",adminAuth,brandController.unBlockBrand);
 router.get("/deleteBrand",adminAuth,brandController.deleteBrand);
 
 
-//prodt mngnt
+//product management
 router.get("/addProducts",isSessionAdmin,adminAuth,productController.getProductAddPage);
 router.post("/addProducts",adminAuth,uploads.array("images",4),productController.addProducts);
 router.get("/products",isSessionAdmin,adminAuth,productController.getAllProducts);
