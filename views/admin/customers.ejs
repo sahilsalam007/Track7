@@ -1,0 +1,65 @@
+<%- include("../../views/partials/admin/header") %>
+<div class="content-header row">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="content-title card-title">Customers</h2>
+    </div>
+</div>         
+</div>
+
+<header class="card-header text-center mb-4">
+    <form action="/admin/users/" method="get" class="d-inline">
+        <div class="input-group input-group-sm border rounded-pill shadow-sm" style="width: 500px; margin: auto;">
+            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search customers..." name="search">
+            <button class="btn btn-primary rounded-pill px-3" type="submit">Search</button>
+        </div>
+    </form>
+</header>
+
+<div class="container mt-4">
+    <table class="table table-hover text-center shadow-sm rounded overflow-hidden">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (typeof data !== "undefined" && data.length > 0) { %>
+                <% data.forEach((user) => { %>
+                    <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.phone %></td>
+                        <td>
+                            <% if (user.isBlocked === false) { %>
+                                <a href="/admin/blockCustomer?id=<%= user._id %>" class="btn btn-danger px-4 py-1">Block</a>
+                            <% } else { %>
+                                <a href="/admin/unblockCustomer?id=<%= user._id %>" class="btn btn-success px-4 py-1">Unblock</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No customers found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <% if (typeof totalPages !== "undefined" && typeof currentPage !== "undefined") { %>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
+                        <a class="page-link rounded-pill" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>
