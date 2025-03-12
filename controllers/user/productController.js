@@ -3,7 +3,7 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Brand = require('../../models/brandSchema')
 const Wishlist = require("../../models/wishlistschema")
-const Cart = require("../../models/cartschema")
+
 
 const productDetails = async (req, res) => {
   try {

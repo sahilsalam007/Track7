@@ -15,27 +15,25 @@ const cartSchema=new Schema({
         },
         quantity:{
             type:Number,
-            default:1,
-            min:1
+            default:1
         },
         price:{
             type:Number,
             required:true
         },
-        maxQuantity:{
+        totalPrice:{
             type:Number,
             required:true
+        },
+        status:{
+            type:String,
+            default:"placed"
+        },
+        cancellationReason:{
+            type:String,
+            default:"none"
         }
-    }],
-    createdAt:{
-        type:Date,
-        default:Date.now
-    },
-    updateAt:{
-        type:Date,
-        default:Date.now
-    }
-},{timestamps:true});
-
+    }]
+})
 const Cart=mongoose.model("Cart",cartSchema);
 module.exports=Cart;

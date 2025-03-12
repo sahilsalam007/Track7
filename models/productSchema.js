@@ -35,10 +35,6 @@ const productSchema=new Schema({
         type:Number,
         default:0
     },
-    maxPurchaseQuantity:{
-        type:Number,
-        default:10
-    },
     color:{
         type:String,
         required:true
@@ -51,10 +47,6 @@ const productSchema=new Schema({
         type:Boolean,
         default:false
     },
-    isListed:{
-        type:Boolean,
-        default:true
-    },
     status:{
         type:String,
         enum:["Available","out of stock","Discontinued"],
@@ -62,10 +54,6 @@ const productSchema=new Schema({
         default:"Available"
     },
 },  {timestamps:true});
-
-productSchema.virtual("inStock").get(function(){
-    return this.quantity > 0 && this.status ==="Available";
-})
 
 const Product=mongoose.model("Product",productSchema)
 module.exports=Product;

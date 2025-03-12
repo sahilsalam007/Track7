@@ -1,0 +1,364 @@
+<%- include("../../views/partials/user/header") %>
+    <style>
+        footer {
+            display: none;
+        }
+
+        .main {
+            padding: 2rem 0;
+        }
+
+        .breadcrumb-wrap {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+        }
+
+        .breadcrumb {
+            margin-bottom: 0;
+        }
+
+        .cart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .cart-items {
+            flex: 1 1 60%;
+        }
+
+        .cart-summary {
+            flex: 1 1 30%;
+        }
+
+        .cart-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .cart-card img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .cart-card .product-details {
+            flex: 1;
+        }
+
+        .cart-card .product-details h5 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .cart-card .product-details p {
+            margin: 0.5rem 0;
+            color: #6c757d;
+        }
+
+        .cart-card .price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .cart-card .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-card .quantity-control input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 0.25rem;
+        }
+
+        .cart-card .quantity-control button {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .cart-card .quantity-control button:hover {
+            background-color: #e9ecef;
+        }
+
+        .cart-card .remove-btn {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        .cart-card .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        .cart-summary-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .cart-summary-card h4 {
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .cart-summary-card table {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .cart-summary-card table td {
+            padding: 0.5rem 0;
+        }
+
+        .cart-summary-card .btn-primary {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: #000000;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .cart-summary-card .btn-primary:hover {
+            background-color: #333333;
+        }
+
+        .text-primary {
+            color: #007bff !important;
+        }
+
+        .font-lg {
+            font-size: 1.25rem;
+        }
+
+        .fw-900 {
+            font-weight: 900;
+        }
+
+        /* Style for the "Go Back to Shopping" button */
+        .go-back-btn {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: #000000;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .go-back-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+
+    <main class="main bg-light">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/shop" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+
+        <section class="mt-5 mb-5">
+            <div class="container">
+                <div class="cart-container">
+                    <!-- Cart Items -->
+                    <div class="cart-items">
+                        <h3 class="mb-4">Your Cart</h3>
+                        <% if (data.length > 0) { %>
+                            <% for (let i = 0; i < data.length; i++) { %>
+                                <div class="cart-card">
+                                    <img src="/uploads/re-image/<%= data[i].productImage %>" alt="Product Image" />
+        
+                                    <div class="product-details">
+                                        <h5><%= data[i].productName %></h5>
+                                        <p><%= data[i].brand %></p>
+                                        <p class="price">₹<span id="subTotal<%= i %>">
+                                            <%= data[i].salePrice * data[i].quantity %>
+                                        </span></p>
+                                    </div>
+        
+                                    <div class="quantity-control">
+                                        <button 
+                                            onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, -1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
+                                            -
+                                        </button>
+                                        <input id="cartProductQuantity<%= i %>" value="<%= data[i].quantity %>" readonly>
+                                        <button 
+                                            onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, 1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
+                                            +
+                                        </button>
+                                    </div>
+                                    
+                                    
+        
+                                    <button class="remove-btn" onclick="confirmRemove('<%= data[i]._id %>')">Remove</button>
+                                </div>
+                            <% } %>
+                        <% } else { %>
+                            <div class="cart-card">
+                                <p class="lead mb-0">No items found in Cart</p>
+                            </div>
+                        <% } %>
+        
+                        <!-- Go Back to Shopping Button -->
+                        <a href="/shop" class="go-back-btn">Go Back to Shopping</a>
+                    </div>
+        
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <div class="cart-summary-card">
+                            <h4>PRICE DETAILS</h4>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td class="cart_total_label">Shipping</td>
+                                        <td class="cart_total_amount">Free Shipping</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label">Total</td>
+                                        <td class="cart_total_amount text-primary font-lg fw-900">
+                                            <text id="total">
+                                                <%= grandTotal %>
+                                            </text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="/checkout?userId=<%= user._id %>" class="btn btn-primary">Proceed To Checkout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+function changeQuantity(productId, cartQuantity, count, productPrice, productIndex, productTotalQuantity) {
+    console.log({ productId, cartQuantity, count, productPrice, productIndex, productTotalQuantity });
+
+    const cartProductQuantityElement = document.querySelector(`#cartProductQuantity${productIndex}`);
+    const subtotalElement = document.querySelector(`#subTotal${productIndex}`);
+    const grandTotalElement = document.getElementById('total');
+
+    if (!cartProductQuantityElement || !subtotalElement || !grandTotalElement) {
+        console.error("Elements not found");
+        return;
+    }
+
+    let currentQuantity = parseInt(cartProductQuantityElement.value);
+    const newQuantity = currentQuantity + count;
+
+    if (newQuantity < 1 || newQuantity > productTotalQuantity) {
+        Swal.fire({
+            title: 'Error',
+            text: newQuantity < 1 ? 'Quantity cannot be less than 1' : 'Product is out of stock',
+            icon: 'error',
+            timer: 5000
+        });
+        return;
+    }
+    if (newQuantity > 5) {
+        Swal.fire({
+            title: 'Error',
+            text: 'You Can Only Buy up to 5 Products',
+            icon: 'error',
+            timer: 5000
+        });
+        return;
+    }
+
+    console.log("🔹 Sending AJAX Request with Data:", { productId, count });
+
+$.ajax({
+    url: '/changeQuantity?t=' + new Date().getTime(),
+    method: 'POST',
+    data: { productId: productId, count: count },
+    success: (response) => {
+        console.log("🔹 Server Response:", response); // Check what the server returns
+        if (response.status) {
+            cartProductQuantityElement.value = response.quantityInput;
+            subtotalElement.textContent = `₹${response.totalAmount}`;
+            grandTotalElement.textContent = `₹${response.grandTotal}`;
+        } else {
+            Swal.fire({ title: 'Error', text: response.error || 'Something went wrong.', icon: 'error' });
+        }
+    },
+    error: (error) => {
+        console.error("🔴 AJAX Error:", error);
+        Swal.fire({ title: 'Error', text: 'Something went wrong.', icon: 'error' });
+    }
+});
+
+}
+
+
+        function confirmRemove(productId) {
+            console.log("Product ID to remove:", productId); 
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/deleteItem?id=${productId}`;
+                }
+            });
+        }
+   
+        document.addEventListener("DOMContentLoaded", function () {
+            const message = "<%= typeof message !== 'undefined' ? message : '' %>"; // Ensures message is defined
+    
+            if (message && message.trim() !== "") {
+                Swal.fire({
+                    title: "Warning!",
+                    text: message,
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+        
+    </script>
+    
+
+    <%- include("../../views/partials/user/footer") %>

@@ -4,13 +4,16 @@ const passport = require("passport");
 const userController=require("../controllers/user/userController");
 const profileController=require("../controllers/user/profileController")
 const productController=require("../controllers/user/productController");
+const checkOutController = require('../controllers/user/checkoutController')
 const {userAuth} = require("../middlewares/auth");
+const cartController=require("../controllers/user/cartController");
+const Address = require("../models/addressSchema");
 
 
 //err and page navigation
 router.get("/pageNotFound",userController.pageNotFound);
 router.get("/",userController.loadHomepage);
-router.get("/shop",userController.loadShoppingPage);
+router.get("/shop",userAuth,userController.loadShoppingPage);
 
 
 //gogleauth
@@ -56,8 +59,20 @@ router.post("/addAddress",userAuth,profileController.postAddAddress);
 router.get("/editAddress",userAuth,profileController.editAddress);
 router.post("/editAddress",userAuth,profileController.postEditAddress);
 router.get("/deleteAddress",userAuth,profileController.deleteAddress);
+
+//cart management
+router.get("/cart",userAuth,cartController.getCartPage);
+router.post("/addToCart/:id",userAuth,cartController.addToCart);
+router.get("/deleteItem",userAuth,cartController.deleteProduct)
+router.post("/changeQuantity",userAuth,cartController.changeQuantity);
+router.post("/wishlist/moveAlltoCart",userAuth,cartController.moveAllToCart);
 //prdt rot
 router.get("/productDetails",userAuth,productController.productDetails);
+
+//checkout Rot
+router.get('/checkOut',userAuth,checkOutController.getCheckOut)
+router.post('/add-address',userAuth,checkOutController.addaddress)
+router.post('/edit-address',userAuth,checkOutController.editaddress)
 
 
 module.exports=router;
