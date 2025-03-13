@@ -218,8 +218,8 @@
 
                 <div class="checkout-section mt-4">
                     <h3 class="mb-4">Order Items</h3>
-                    <%if(cart && cart.items.length> 0) {%>
-                        <% cart.items.forEach(item=> {%>
+                    <%if(cart && cart.length> 0) {%>
+                        <% cart.forEach(item=> {%>
                             <div class="cart-item">
                                 <img src="/uploads/re-image/<%= item.productId.productImage[0]%>" alt="Product"
                                     class="product-thumbnail">
@@ -230,7 +230,7 @@
                                     <div class="d-flex justify-content-between">
                                         <div>Quantity: <%=item.quantity%>
                                         </div>
-                                        <div class="text-primary">₹<%=item.totalPrice%>
+                                        <div class="text-primary">₹<%=item.productId.salesPrice * item.quantity%>
                                         </div>
                                     </div>
                                 </div>
@@ -257,7 +257,7 @@
                 <div class="checkout-section">
                     <h3 class="mb-4">Price Details</h3>
                     <div class="summary-item">
-                        <span>Price (<%= cart ? cart.items.length : 0 %> items)</span>
+                        <span>Price (<%= cart ? cart.items : 0 %> items)</span>
                         <span>₹<%=totalPrice%></span>
                     </div>
                     <div class="summary-item">
