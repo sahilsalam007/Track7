@@ -44,9 +44,14 @@ const adminAuth=(req,res,next)=>{
         res.status(500).send("Internal Server Error")
     })
 }
+const session=((req, res, next) => {
+    res.locals.user = req.session.user || null;  // Set user from session
+    next();
+});
 
 module.exports={
     userAuth,
     adminAuth,
-    isSessionAdmin
+    isSessionAdmin,
+    session
 }

@@ -6,14 +6,15 @@ const profileController=require("../controllers/user/profileController")
 const productController=require("../controllers/user/productController");
 const checkOutController = require('../controllers/user/checkoutController')
 const {userAuth} = require("../middlewares/auth");
+const {session}=require("../middlewares/auth")
 const cartController=require("../controllers/user/cartController");
 const Address = require("../models/addressSchema");
-
+const orderController=require("../controllers/user/orderController");
 
 //err and page navigation
 router.get("/pageNotFound",userController.pageNotFound);
 router.get("/",userController.loadHomepage);
-router.get("/shop",userAuth,userController.loadShoppingPage);
+router.get("/shop",userAuth,session,userController.loadShoppingPage);
 
 
 //gogleauth
@@ -74,6 +75,13 @@ router.get('/checkOut',userAuth,checkOutController.getCheckOut)
 router.post('/add-address',userAuth,checkOutController.addaddress)
 router.post('/edit-address',userAuth,checkOutController.editaddress)
 
+//order Mngt
+router.post('/orderPlaced',userAuth,orderController.orderPlaced)
+router.get('/order-success',userAuth,orderController.loadOrderSuccess)
+router.get('/orders',session,userAuth,orderController.viewOrders)
+router.post('/cancel-order/:orderId',userAuth,orderController.cancelOrder)
+router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 
+   
 
 module.exports=router;

@@ -1,0 +1,206 @@
+<%- include("../../views/partials/user/header") %>
+    <style>
+        :root {
+            --primary: #2A2F4F;
+            --secondary: #917FB3;
+            --accent: #E5BEEC;
+            --light: #FDE2F3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 15px;
+        }
+
+        .checkout-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-shipped { background: #cce5ff; color: #004085; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .order-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .order-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .order-details {
+            flex-grow: 1;
+        }
+
+        .price-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--light);
+        }
+
+        .detail-item {
+             
+            justify-content: space-between;
+        }
+
+        .total-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: rgb(226, 65, 65);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .btn:hover {
+            background-color: #b02a37;
+            color: white;
+        }
+        .cancell-btn{
+            width:20%;
+            padding: 0.85rem;
+            background-color:#000000 !important;
+            color: rgb(88, 76, 76);
+            border: none !important;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            margin-top: 1rem;
+           margin-left: 55rem;
+
+        }
+        .cancell-btn:hover{
+            background-color:red !important;
+            color: #ffffff ;
+        }
+        .header_nav_option{
+            display: none;
+        }
+    </style>
+  
+</head>
+<body>
+    <div class="checkout-container">
+        <h1>My Orders</h1>
+
+      
+            <div class="alert "></div>
+        <% if (!orders || orders.length === 0) { %>
+            <p>No orders found.</p>
+        <% } else { %>
+            <% orders.forEach(order => { %>
+                <div class="checkout-section">
+                    <div class="order-header">
+                        <div>
+                            <h3>Order #<%= order.orderId %></h3>
+                            <p class="text-muted"><%= new Date(order.createdOn).toDateString() %></p>
+                        </div>
+                        <div class="order-status 
+                            <% if (order.status === 'Pending') { %>status-pending
+                            <% } else if (order.status === 'Shipped') { %>status-shipped
+                            <% } else if (order.status === 'Delivered') { %>status-delivered
+                            <% } else if (order.status === 'Cancelled') { %>status-cancelled
+                            <% } %>">
+                            <%= order.status %>
+                        </div>
+                    </div>
+
+                    <% order.orderedItems.forEach(item => { %>
+                        <div class="order-item">
+                            <img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="<%= item.product.name %>">
+                            <div class="order-details">
+                                <h4><%= item.product.productName %></h4>
+                                <p>Price: ₹<%= item.price %></p>
+                                <p>Quantity: <%= item.quantity %></p>
+                                <% if (item.size) { %><p>Size: <%= item.size %></p><% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+
+                    <div class="price-details">
+                        <div class="detail-item">
+                            <span>Total Price:</span>
+                            <span>₹<%=order.totalPrice %></span>
+                        </div>
+                        <div class="detail-item">
+                            <span>Discount:</span>
+                            <span>- ₹<%= order.discount %></span>
+                        </div>
+                        <div class="detail-item total-price">
+                            <span>Final Amount:</span>
+                            <span>₹<%= order.finalAmount %></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <form action="/cancel-order/<%= order.orderId %>" method="post">
+                        <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                            <button type="submit" class="cancell-btn">Cancel Order</button>
+                        <% } %>
+                    </form>                    
+
+                    <a class="btn" href="/order-details/<%= order._id %>">
+                        View Details
+                    </a>
+                </div>
+            <% }); %>
+        <% } %>
+
+    </div>
+</body>
+</html>
+<%- include("../../views/partials/user/footer") %>

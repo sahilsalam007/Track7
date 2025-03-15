@@ -29,7 +29,7 @@ const couponSchema=new mongoose.Schema({
         default:true
     },
     userId:[{
-        type:mongoose.Schema.Types.Array.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }]
 })

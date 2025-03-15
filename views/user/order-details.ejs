@@ -1,0 +1,249 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+    :root {
+        --primary: #2A2F4F;
+        --secondary: #917FB3;
+        --accent: #E5BEEC;
+        --light: #FDE2F3;
+    }
+
+    .header_nav_option {
+        display: none;
+    }
+
+    .order-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 15px;
+    }
+
+    .order-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light);
+    }
+
+    .order-id {
+        color: var(--primary);
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .status-return-request { background: var(--accent); color: var(--primary); }
+
+    .order-item {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--light);
+    }
+
+    
+
+    .order-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .item-details {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .price-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--light);
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .total-price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+
+    .shipping-address {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--light);
+    }
+
+    .btn {
+        width: auto;
+        padding: 0.85rem 2rem;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        margin-top: 1.5rem;
+    }
+
+    .btn:hover {
+        background-color: #b02a37;
+        color: white;
+    }
+
+    .cancell-btn {
+        background-color: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+    }
+
+    .cancell-btn:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .back-btn {
+        background-color: var(--secondary);
+        color: white;
+    }
+    /* .order-item .item-details h4 {
+    color: red !important; /* Change 'red' to any color you want */
+} */
+
+
+    .back-btn:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+    /* .item-details h4 {
+    color: red !important; 
+} */
+    header{
+        display: none;
+    }
+    footer{
+        display: none;
+    }
+</style>
+
+<div class="order-container">
+    <% if (order) { %>
+            <div class="order-section">
+                <div class="order-header">
+                    <h2 class="order-id">Order #<%= order.orderId %></h2>
+                    <span class="order-status status-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                        <%= order.status %>
+                    </span>
+                </div>
+                <div class="order-items">
+                    <% order.orderedItems.forEach(item => { %>
+                        <div class="order-item">
+                            <img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="Product Image">
+                            <div class="item-details">
+                                <h4 class="names"><%= item.product.productName %></h4>
+                                <div class="item-info">
+                                    <p>Quantity: <%= item.quantity %></p>
+                                    <p>Price: ₹<%= item.price.toFixed(2) %></p>
+                                </div>
+                            </div>
+                            <div class="item-total">
+                                <p>Total: ₹<%= (item.price * item.quantity).toFixed(2) %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+                <div class="price-details">
+                    <div class="detail-item">
+                        <span>Total Price:</span>
+                        <span>₹<%= order.totalPrice.toFixed(2) %></span>
+                    </div>
+                    <% if (order.discount > 0) { %>
+                        <div class="detail-item">
+                            <span>Discount:</span>
+                            <span>- ₹<%= order.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    <div class="detail-item total-price">
+                        <span>Final Amount:</span>
+                        <span>₹<%= order.finalAmount.toFixed(2) %></span>
+                    </div>
+                </div>
+                <div class="shipping-address">
+                    <h3>Shipping Address</h3>
+                    <div class="address-details">
+                        <p><%= order.address.name %></p>
+                        <p><%= order.address.city %>, <%= order.address.state %></p>
+                        <p>Landmark: <%= order.address.landMark %></p>
+                        <p>Pincode: <%= order.address.pincode %></p>
+                        <p>Phone: <%= order.address.phone %> <%= order.address.altPhone ? '| ' + order.address.altPhone : '' %></p>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <a href="/orders" class="btn back-btn">← Back to Orders</a>
+                    <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                        <a href="/cancel-order/<%= order._id %>" class="btn cancel-btn">Cancel Order</a>
+                    <% } %>
+                </div>
+            </div>
+    <% } else { %>
+        <div class="empty-orders">
+            <h3>No orders found.</h3>
+            <p>You haven't placed any orders yet.</p>
+            <a href="/shop" class="btn">Go to Shop</a>
+        </div>
+    <% } %>
+</div>
+
+<%- include("../partials/user/footer") %>

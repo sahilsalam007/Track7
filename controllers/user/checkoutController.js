@@ -20,7 +20,6 @@ const getCheckOut = async (req, res) => {
             user = { items: [] };
             }
         const cart=user.cart
-        console.log(cart);
         const userAddresses = await Address.findOne({ userId })
 
         const currentDate = new Date()

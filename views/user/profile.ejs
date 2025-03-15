@@ -155,11 +155,10 @@
                      <i class="fi-rs-marker mr-10"></i>My Address
                    </a>
                  </li>
-                 <li class="nav-item">
-                   <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false">
-                     <i class="fi-rs-shopping-bag mr-10"></i>Orders
-                   </a>
-                 </li>
+                 <a class="nav-link" id="orders-tab" href="/orders">
+                  <i class="fi-rs-shopping-bag mr-10"></i>Orders
+                </a>
+                
                  <li class="nav-item">
                    <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false">
                      <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet Status
@@ -369,38 +368,15 @@
  </section>
 </main>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    function activateTabFromHash() {
-        let hash = window.location.hash;
-        if (hash) {
-            let tab = document.querySelector(`a[href="${hash}"]`);
-            if (tab) {
-                new bootstrap.Tab(tab).show();
-            }
-        }
-    }
-
-    // Activate tab on page load
-    activateTabFromHash();
-
-    // Listen for tab clicks and update URL hash without refreshing
-    let tabs = document.querySelectorAll('.dashboard-menu .nav-link');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function (e) {
-            e.preventDefault();
-            let target = this.getAttribute('href');
-
-            // Change the tab
-            new bootstrap.Tab(this).show();
-
-            // Update the URL without reloading
-            history.pushState(null, null, target);
+document.addEventListener("DOMContentLoaded", function () {
+    let ordersTab = document.getElementById("orders-tab");
+    if (ordersTab) {
+        ordersTab.addEventListener("click", function () {
+            window.location.href = "/orders"; // Force page reload
         });
-    });
-
-    // Detect URL hash changes (e.g., when the user presses back/forward)
-    window.addEventListener('hashchange', activateTabFromHash);
+    }
 });
+
 
 
 </script>

@@ -8,6 +8,11 @@ const orderSchema=new Schema({
         default:()=>uuidv4(),
         unique:true
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     orderedItems:[{
      product:{
         type:Schema.Types.ObjectId,
@@ -34,10 +39,15 @@ const orderSchema=new Schema({
         type:Number,
         required:true
     },
-    address:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+    address: {  // ✅ Store embedded address instead of ObjectId
+        addressType: String,
+        name: String,
+        city: String,
+        landMark: String,
+        state: String,
+        pincode: Number,
+        phone: String,
+        altPhone: String
     },
     invoiceDate:{
         type:Date

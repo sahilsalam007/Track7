@@ -48,7 +48,6 @@ const getCartPage = async (req, res) => {
         let grandTotal = data.reduce((acc, item) => acc + item.salePrice * item.quantity, 0);
 
         req.session.grandTotal = grandTotal;
-        // console.log(data)
 
         res.render("cart", {
             user,
