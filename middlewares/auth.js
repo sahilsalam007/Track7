@@ -7,7 +7,7 @@ const userAuth = (req, res, next) => {
             .then(data => {
                 if (data && !data.isBlocked) {
                     req.user = data;  // ✅ Set req.user with the user object
-                    console.log("Middleware user:", req.user);  // Debug log
+                 // Debug log
                     next();
                 } else {
                     res.redirect("/login");

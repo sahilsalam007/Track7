@@ -151,29 +151,47 @@ const addToCart = async (req, res) => {
     }
 };
 
-const deleteProduct =async (req,res)=>{
+const deleteProduct = async (req, res) => {
     try {
-        const productId=req.query.id;
-        const userId=req.session.user;
-        if(!userId){
+        console.log("🔹 Route hit: deleteProduct");
+        console.log("🔹 Full Query Params:", req.query);
+
+        const productId = req.query.id;
+        console.log("🔹 Product ID to remove:", productId); 
+
+        if (!productId) {
+            console.log("❌ Product ID missing in query params!");
             return res.redirect("/pageNotFound");
         }
-        const user=await User.findById(userId);
-        if(!user){
+
+        const userId = req.session.user;
+        if (!userId) {
+            console.log("❌ No user session found!");
             return res.redirect("/pageNotFound");
         }
-        const cartIndex =user.cart.findIndex(
-           (item)=>item.productId.toString()=== productId.toString()
+
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log("❌ User not found in DB!");
+            return res.redirect("/pageNotFound");
+        }
+
+        const cartIndex = user.cart.findIndex(
+            (item) => item.productId.toString() === productId.toString()
         );
-        if(cartIndex === -1){
+
+        if (cartIndex === -1) {
+            console.log("❌ Product not found in cart!");
             return res.redirect("/cart");
         }
 
         user.cart.splice(cartIndex, 1);
         await user.save();
+        console.log("✅ Product removed from cart!");
         res.redirect("/cart");
 
     } catch (error) {
+        console.error("🚨 Error in deleteProduct:", error);
         res.redirect("/pageNotFound");
     }
 };
