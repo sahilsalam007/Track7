@@ -292,11 +292,11 @@
 
 
             try {
-                const response = await fetch("/orderPlaced", {  // Match this with your router
+                const response = await fetch("/orderPlaced", {  
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        userId: userId,  // Make sure this is correctly passed
+                        userId: userId, 
                         addressId: addressId,
                         totalPrice: totalPrice
                     })
@@ -315,13 +315,8 @@
             }
         }
 
-
-
-        //for edit address  / add address
-
-
         function editAddress(index, id, name, addressType, city, landMark, state, pincode, phone) {
-            document.getElementById("addressIndex").value = index; // Set the address index
+            document.getElementById("addressIndex").value = index; 
             document.getElementById("addressId").value = id;
             document.getElementById("name").value = name;
             document.getElementById("addressType").value = addressType;
@@ -331,16 +326,11 @@
             document.getElementById("pincode").value = pincode;
             document.getElementById("phone").value = phone;
 
-            // Change modal title
             document.getElementById("addAddressModalLabel").innerText = "Edit Address";
 
-            // Show the modal
             var modal = new bootstrap.Modal(document.getElementById("addAddressModal"));
             modal.show();
         }
-
-
-
 
         document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
             e.preventDefault();

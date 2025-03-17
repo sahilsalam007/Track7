@@ -39,7 +39,7 @@ const orderSchema=new Schema({
         type:Number,
         required:true
     },
-    address: {  // ✅ Store embedded address instead of ObjectId
+    address: { 
         addressType: String,
         name: String,
         city: String,
@@ -65,6 +65,11 @@ const orderSchema=new Schema({
     couponApplied:{
         type:Boolean,
         default:false
+    },
+    paymentMethod: {
+        type: String,
+        required: true,
+        default:"COD"
     }
 })
 const Order=mongoose.model("Order",orderSchema);

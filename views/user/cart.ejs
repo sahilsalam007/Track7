@@ -192,7 +192,6 @@
         <section class="mt-5 mb-5">
             <div class="container">
                 <div class="cart-container">
-                    <!-- Cart Items -->
                     <div class="cart-items">
                         <h3 class="mb-4">Your Cart</h3>
                         <% if (data.length > 0) { %>
@@ -230,12 +229,8 @@
                                 <p class="lead mb-0">No items found in Cart</p>
                             </div>
                         <% } %>
-        
-                        <!-- Go Back to Shopping Button -->
                         <a href="/shop" class="go-back-btn">Go Back to Shopping</a>
                     </div>
-        
-                    <!-- Cart Summary -->
                     <div class="cart-summary">
                         <div class="cart-summary-card">
                             <h4>PRICE DETAILS</h4>
@@ -303,14 +298,14 @@ function changeQuantity(productId, cartQuantity, count, productPrice, productInd
         return;
     }
 
-    console.log("🔹 Sending AJAX Request with Data:", { productId, count });
+    console.log("Sending AJAX Request with Data:", { productId, count });
 
 $.ajax({
     url: '/changeQuantity?t=' + new Date().getTime(),
     method: 'POST',
     data: { productId: productId, count: count },
     success: (response) => {
-        console.log("🔹 Server Response:", response); // Check what the server returns
+        console.log("🔹 Server Response:", response); 
         if (response.status) {
             cartProductQuantityElement.value = response.quantityInput;
             subtotalElement.textContent = `₹${response.totalAmount}`;
@@ -320,7 +315,7 @@ $.ajax({
         }
     },
     error: (error) => {
-        console.error("🔴 AJAX Error:", error);
+        console.error("AJAX Error:", error);
         Swal.fire({ title: 'Error', text: 'Something went wrong.', icon: 'error' });
     }
 });
@@ -346,7 +341,7 @@ $.ajax({
         }
    
         document.addEventListener("DOMContentLoaded", function () {
-            const message = "<%= typeof message !== 'undefined' ? message : '' %>"; // Ensures message is defined
+            const message = "<%= typeof message !== 'undefined' ? message : '' %>";
     
             if (message && message.trim() !== "") {
                 Swal.fire({

@@ -634,14 +634,12 @@
                       text: "Product successfully added to cart!",
                       confirmButtonText: "OK",
                   }).then(() => {
-                      // Change button appearance and behavior
                       button.text("Go to Cart").removeClass("add-cart").addClass("go-to-cart-btn");
                       button.attr("href", "/cart").off("click").on("click", function () {
                           window.location.href = "/cart";
                       });
                   });
 
-                  // Check if stock turns zero dynamically
                   if (response.stockRemaining === 0) {
                       button.text("Out of Stock").prop("disabled", true).addClass("out-of-stock-btn");
                   }
@@ -657,7 +655,6 @@
           });
       });
 
-      // Ensure products already in cart show "Go to Cart"
       $(".go-to-cart-btn").on("click", function () {
           window.location.href = "/cart";
       });

@@ -11,32 +11,27 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 const orderPlaced = async (req, res) => {
     try {
+        console.log("User in request:", req.user);
+        console.log("Session user:", req.session.user);
 
         const { totalPrice, addressId, paymentMethod, discount = 99 } = req.body;
         const userId = req.user._id;
 
-        // Validate user
         const findUser = await User.findById(userId);
         if (!findUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Find user's address
         const userAddressDoc = await Address.findOne({ userId });
         if (!userAddressDoc) {
             return res.status(404).json({ error: "Address not found" });
         }
 
-        // Find the selected address subdocument
         const desiredAddress = userAddressDoc.address.id(addressId);
         if (!desiredAddress) {
             return res.status(404).json({ error: "Selected address not found" });
         }
 
-        
-      
-
-         
         const user = await User.findOne({ _id:userId }).populate('cart.productId');
         const cart =user.cart;
         console.log("working here",cart);
@@ -45,15 +40,8 @@ const orderPlaced = async (req, res) => {
             return res.status(400).json({ error: "Your cart is empty." });
         }
 
-
-                          
-
-        // Check product stock
         const outOfStockItems = [];
         for (const item of cart) {
-         
-            
-
             const product = await Product.findOne({_id : item.productId});
            
             if (!product || product.quantity < item.quantity) {
@@ -65,9 +53,6 @@ const orderPlaced = async (req, res) => {
             }
         }
 
-
- 
-
         if (outOfStockItems.length > 0) {
             return res.status(400).json({
                 error: "Some items are out of stock.",
@@ -75,20 +60,18 @@ const orderPlaced = async (req, res) => {
             });
         }
 
-        // Update product quantities
         for (const item of cart) {
             const product = await Product.findById(item.productId);
             product.quantity -= item.quantity;
             await product.save();
         }
 
-        // Create the order with embedded address and mapped items
         const newOrder = new Order({
             userId,
             orderedItems: cart.map(item => ({
                 product: item.productId,
                 quantity: item.quantity,
-                price: item.productId.salesPrice, // Use correct field
+                price: item.productId.salesPrice, 
                 size: item.size
             })),
             totalPrice,
@@ -108,15 +91,9 @@ const orderPlaced = async (req, res) => {
             status: "Pending"
         });
         
-
         await newOrder.save();
-
-        // Clear the user's cart
         await User.updateOne({ _id: userId }, { $set: { cart: [] } });
-
-
         res.status(200).json({ success: true, message: "Order placed successfully!", order: newOrder });
-
     } catch (error) {
         console.error("Error placing order:", error);
         res.status(500).json({ error: "Internal server error" });

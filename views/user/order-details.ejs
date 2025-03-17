@@ -233,9 +233,13 @@
                 <div class="action-buttons">
                     <a href="/orders" class="btn back-btn">← Back to Orders</a>
                     <% if (order.status === 'Pending' || order.status === 'Processing') { %>
-                        <a href="/cancel-order/<%= order._id %>" class="btn cancel-btn">Cancel Order</a>
+                        <form action="/cancel-order/<%= order.orderId %>" method="post"
+                            style="display: inline;">
+                            <button type="submit" class="btn cancel-btn">Cancel Order</button>
+                        </form>
                     <% } %>
                 </div>
+                
             </div>
     <% } else { %>
         <div class="empty-orders">

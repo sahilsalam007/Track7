@@ -4,6 +4,7 @@ const adminController=require("../controllers/admin/adminController");
 const {userAuth,adminAuth,isSessionAdmin}=require("../middlewares/auth");
 const customerController=require("../controllers/admin/customerController");
 const categoryController=require("../controllers/admin/categoryController");
+const orderController=require("../controllers/admin/orderController");
 const multer=require("multer");
 const storage=require("../helpers/multer");
 const uploads=multer({storage});
@@ -52,5 +53,13 @@ router.get("/unblockProduct",adminAuth,productController.unblockProduct);
 router.get("/editProduct",adminAuth,productController.getEditProduct);
 router.post("/editProduct/:id",adminAuth,uploads.array("images",4),productController.editProduct);
 router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
+
+
+//order management
+router.get('/orders',isSessionAdmin,adminAuth,orderController.getorder);
+ router.get('/api/orders', isSessionAdmin,adminAuth, orderController.getOrderList);
+ router.get('/order-details/:orderId',isSessionAdmin, adminAuth,orderController.getorderDetails);
+ router.post('/update-order-status',isSessionAdmin,adminAuth,orderController.updateStatus);
+
 
 module.exports=router;

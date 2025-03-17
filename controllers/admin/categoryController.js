@@ -51,7 +51,7 @@ const addCategory = async (req,res) =>{
             success:false,
             error:"Internal Server error"
         });
-    }
+    }
 };
 
 
@@ -143,25 +143,34 @@ const getEditCategory=async(req,res)=>{
 };
 
 
-const editCategory=async (req,res)=>{
+const editCategory = async (req, res) => {
     try {
-        const id=req.params.id;
-        const {categoryName,description}=req.body;
-        const existingCategory= await Category.findOne({name:categoryName});
-        if(existingCategory){
-            return res.status(400).json({error:"Category exists, please choose another name"})
+        const id = req.params.id;
+        const { categoryName, description } = req.body;
+
+        if (!categoryName || !description) {
+            return res.status(400).json({ error: "Category name and description are required" });
         }
-        const updateCategory= await Category.findByIdAndUpdate(id,{
-            name:categoryName,
-            description:description
-        },{new:true});
-        if(updateCategory){
-            res.redirect("/admin/category");
-        }else{
-            res.status(404).json({error:"Category not found"})
+
+        const existingCategory = await Category.findOne({ name: categoryName });
+        if (existingCategory && existingCategory._id.toString() !== id) {
+            return res.status(400).json({ error: "Category already exists" });
         }
+
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
+            { name: categoryName, description: description },
+            { new: true }
+        );
+
+        if (!updatedCategory) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+
+        res.json({ success: true, message: "Category updated successfully!" });
+
     } catch (error) {
-        res.status(500).json({error:"Internal server error"})
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 

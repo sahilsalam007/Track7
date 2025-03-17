@@ -43,7 +43,6 @@ const getCheckOut = async (req, res) => {
     }
 }
 
-
 const addaddress = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -91,7 +90,6 @@ const addaddress = async (req, res) => {
         res.redirect('/checkOut');
     }
 }
-
 
 const editaddress = async (req, res) => {
 
