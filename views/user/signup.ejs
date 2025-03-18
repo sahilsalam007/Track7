@@ -243,7 +243,6 @@
         const error5 = document.getElementById("error5");
         const signform = document.getElementById("signform");
 
-        // Validate Name
         function nameValidateChecking() {
             const nameval = nameid.value;
             const namepattern = /^[A-Za-z\s]+$/;
@@ -262,7 +261,6 @@
             }
         }
 
-        // Validate Email
         function emailValidateChecking() {
             const emailval = emailid.value;
             const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -277,7 +275,6 @@
             }
         }
 
-        // Validate Phone Number
         function phoneValidateChecking() {
             const phoneval = phoneid.value;
             console.log("Phone number entered:", phoneval);
@@ -295,7 +292,6 @@
             }
         }
 
-        // Validate Password
         function passValidateChecking() {
             const passval = passid.value;
             const cpass = cpassid.value;
@@ -319,8 +315,6 @@
             }
         }
 
-          
-        // Form Submit Validation
         signform.addEventListener("submit", function (e) {
             console.log("Form submitted"); 
             const isNameValid = nameValidateChecking();
@@ -333,7 +327,7 @@
                 console.log("Form submission prevented due to validation errors");
             }
         });
-    });
+  });
 
 
 </script>

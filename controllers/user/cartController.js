@@ -3,7 +3,6 @@ const Product =require("../../models/productSchema");
 const mongodb =require("mongodb");
 const mongoose = require("mongoose");
 
-
 const getCartPage = async (req, res) => {
     try {
         const id = req.session.user;
@@ -12,11 +11,9 @@ const getCartPage = async (req, res) => {
         if (!user) {
             return res.redirect("/pageNotFound");
         }
-
         const productIds = user.cart.map((item) => item.productId);
         const products = await Product.find({ _id: { $in: productIds } });
-
-        const oid = new mongoose.Types.ObjectId(id);  // Correct way to convert to ObjectId
+        const oid = new mongoose.Types.ObjectId(id); 
 
         let data = await User.aggregate([
             { $match: { _id: oid } },
@@ -29,7 +26,7 @@ const getCartPage = async (req, res) => {
                     as: "productDetails",
                 },
             },
-            { $unwind: "$productDetails" }, // Ensure only 1 product details object per item
+            { $unwind: "$productDetails" },
             {
                 $project: {
                     _id: 0,
@@ -43,19 +40,14 @@ const getCartPage = async (req, res) => {
                 },
             },
         ]);
-
-        // Calculate grand total
         let grandTotal = data.reduce((acc, item) => acc + item.salePrice * item.quantity, 0);
-
         req.session.grandTotal = grandTotal;
-
         res.render("cart", {
             user,
             quantity: user.cart.reduce((acc, item) => acc + item.quantity, 0),
             data,
             grandTotal,
         });
-
     } catch (error) {
         console.error("Error in getCartPage:", error);
         res.redirect("/pageNotFound");
@@ -64,57 +56,48 @@ const getCartPage = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        const id = req.params.id;  // Get product ID from route parameter
+        const id = req.params.id; 
         const userId = req.session.user;
         const quantity = parseInt(req.body.quantity) || 1;
-        
-        console.log('userid is:', userId);
-        
+        console.log('userid is:', userId);       
         const findUser = await User.findById(userId);
-        const product = await Product.findById(id);
-        
+        const product = await Product.findById(id);       
         if (!product) {
             return res.status(404).json({
                 status: "error",
                 message: "Product not found"
             });
-        }
-        
+        }    
+
         if (product.quantity <= 0) {
             return res.status(400).json({
                 status: "error",
                 message: "Product is out of stock"
             });
         }
-        
-        // Check if product already exists in cart
         const cartIndex = findUser.cart.findIndex(item => 
             item.productId.toString() === id.toString()
         );
         
         if (cartIndex === -1) {
-            // Product doesn't exist in cart, add it
             await User.findByIdAndUpdate(
                 userId,
                 {
                     $push: {
                         cart: {
-                            productId: id,  // Make sure this is an ObjectId
+                            productId: id,
                             quantity: quantity
                         }
                     }
                 },
                 { new: true }
-            );
-            
+            );           
             return res.status(200).json({
                 status: "success",
                 message: "Product added to cart"
             });
         } else {
-            // Product exists in cart, update quantity
-            const productInCart = findUser.cart[cartIndex];
-            
+            const productInCart = findUser.cart[cartIndex];           
             if (productInCart.quantity >= 5) {
                 return res.status(400).json({
                     status: "error",
@@ -123,9 +106,7 @@ const addToCart = async (req, res) => {
             }
             
             if (productInCart.quantity < product.quantity) {
-                const newQuantity = productInCart.quantity + quantity;
-                
-                // Use proper MongoDB update syntax
+                const newQuantity = productInCart.quantity + quantity;    
                 await User.updateOne(
                     { _id: userId, "cart.productId": id },
                     { $set: { "cart.$.quantity": newQuantity } }
@@ -153,53 +134,37 @@ const addToCart = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        console.log("🔹 Route hit: deleteProduct");
-        console.log("🔹 Full Query Params:", req.query);
-
         const productId = req.query.id;
-        console.log("🔹 Product ID to remove:", productId); 
-
         if (!productId) {
-            console.log("❌ Product ID missing in query params!");
             return res.redirect("/pageNotFound");
         }
-
         const userId = req.session.user;
         if (!userId) {
-            console.log("❌ No user session found!");
             return res.redirect("/pageNotFound");
         }
-
         const user = await User.findById(userId);
         if (!user) {
-            console.log("❌ User not found in DB!");
             return res.redirect("/pageNotFound");
         }
-
         const cartIndex = user.cart.findIndex(
             (item) => item.productId.toString() === productId.toString()
         );
 
         if (cartIndex === -1) {
-            console.log("❌ Product not found in cart!");
             return res.redirect("/cart");
         }
 
         user.cart.splice(cartIndex, 1);
         await user.save();
-        console.log("✅ Product removed from cart!");
         res.redirect("/cart");
 
     } catch (error) {
-        console.error("🚨 Error in deleteProduct:", error);
         res.redirect("/pageNotFound");
     }
 };
 
 const changeQuantity = async (req, res) => {
     try {
-        console.log("🔹 Change Quantity Request:", req.body);
-
         const userId = req.session.user;
         const productId = req.body.productId;
         const count = parseInt(req.body.count);
@@ -265,7 +230,7 @@ const changeQuantity = async (req, res) => {
             res.status(400).json({ status: false, error: "Cart not updated" });
         }
     } catch (error) {
-        console.error("🔴 Error:", error);
+        console.error("Error:", error);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 };
@@ -318,6 +283,5 @@ module.exports={
     addToCart,
     deleteProduct,
     changeQuantity,
-    moveAllToCart,
-    
+    moveAllToCart,  
 }

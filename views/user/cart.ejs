@@ -324,7 +324,7 @@ $.ajax({
 
 function confirmRemove(productId) {
     if (!productId) {
-        console.error("❌ Product ID is missing!");
+        console.error("Product ID is missing!");
         return;
     }
 
@@ -338,7 +338,6 @@ function confirmRemove(productId) {
         confirmButtonText: 'Yes, remove it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            console.log("✅ Redirecting to deleteItem with ID:", productId);
             window.location.href = `/deleteItem?id=${productId}`;
         }
     });

@@ -47,7 +47,6 @@ const updateStatus = async (req,res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Update the order status
         order.status = status;
         await order.save();
 
@@ -91,7 +90,7 @@ const getOrderList = async (req, res) => {
         
         const formattedOrders = orders.map(order => ({
             ...order.toObject(),
-            user: order.userId, // Rename userId to user
+            user: order.userId,
         }));
 
         res.json({

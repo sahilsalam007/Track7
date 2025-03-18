@@ -170,7 +170,6 @@ const editProduct = async (req, res) => {
       const id = req.params.id;
       const data = req.body;
   
-      // Check if a product with the same name already exists (excluding current one)
       const existingProduct = await Product.findOne({
         productName: data.productName,
         _id: { $ne: id },
@@ -178,16 +177,14 @@ const editProduct = async (req, res) => {
       if (existingProduct) {
         return res.status(400).json({ error: "Product with this name already exists." });
       }
-  
-      // Collect the new images
+
       const images = [];
       if (req.files && req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           images.push(req.files[i].filename);
         }
       }
-  
-      // Build the update object
+
       const updateQuery = {
         $set: {
           productName: data.productName,
@@ -201,15 +198,12 @@ const editProduct = async (req, res) => {
           color: data.color,
         },
       };
-  
-      // Only add $push if there are new images
+
       if (images.length > 0) {
         updateQuery.$push = { productImage: { $each: images } };
       }
-  
-      // Execute the update
-      await Product.findByIdAndUpdate(id, updateQuery, { new: true });
-  
+
+      await Product.findByIdAndUpdate(id, updateQuery, { new: true }); 
       console.log("Update successful");
       res.redirect("/admin/products");
     } catch (error) {

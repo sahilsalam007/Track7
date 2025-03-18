@@ -266,7 +266,7 @@
                     </div>
                     <div class="summary-total">
                         <span>Total Amount</span>
-                        <span>₹<%= (totalPrice ? totalPrice : 0) %></span>
+                        <span>₹<%= (totalPrice ? totalPrice -99 : 0) %></span>
                         <input type="hidden" id="totalPriceValue" value="<%= totalPrice ? totalPrice  : 0 %>">
                     </div>
                     <button onclick="placeOrder('<%= user._id %>')" class="btn ">Place Order</button>

@@ -246,16 +246,15 @@ const loadShoppingPage = async (req, res) => {
             minPrice: req.query.minPrice || ''
         };
 
-  
-        // filt defin
         const filter = {
             isBlocked: false,
             status: "Available"
         };
   
         if (query.search) {
-            filter.productName = { $regex: `^${query.search}`, $options: 'i' };
+            filter.productName = { $regex: query.search, $options: 'i' };
         }
+        
         if (query.category) {
             filter.category = query.category;
         }
@@ -268,9 +267,6 @@ const loadShoppingPage = async (req, res) => {
             if (query.maxPrice) filter.salesPrice.$lte = parseInt(query.maxPrice);
         }
 
-        console.log(filter)
-  
-        // Sort opt
         let sortOptions = {};
         switch (query.sort) {
             case 'price-asc':
@@ -288,8 +284,7 @@ const loadShoppingPage = async (req, res) => {
             default:
                 sortOptions = { createdAt: -1 };
         }
-  
-        // Fetch prdct , bran , cat
+
         const [products, categories, brands] = await Promise.all([
             Product.find(filter).sort(sortOptions).populate("category").populate("brand"),
             Category.find({ isListed: true }),
@@ -306,8 +301,7 @@ const loadShoppingPage = async (req, res) => {
             const cart = await Cart.findOne({ userId }).select("items.productId");
             cartItems = cart ? cart.items.map(item => item.productId.toString()) : [];
         }
-  
-        // Render the shop page
+
         res.render("shop", {
             products,
             categories,
@@ -316,14 +310,13 @@ const loadShoppingPage = async (req, res) => {
             userData,
             isLoggedIn: !!userId,
             wishlistItems,
-            cartItems // Pass cart product IDs to the shop page
+            cartItems 
         });
   
     } catch (error) {
         console.error("Shop page error:", error);
-        res.render("login");  
-    }
-  
+        res.render("login");
+    }
 };
 
 

@@ -4,7 +4,6 @@ const User = require("../../models/userSchema");
 const Brand = require('../../models/brandSchema')
 const Wishlist = require("../../models/wishlistschema")
 
-
 const productDetails = async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -33,7 +32,6 @@ const productDetails = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
 
 module.exports = {
   productDetails,
