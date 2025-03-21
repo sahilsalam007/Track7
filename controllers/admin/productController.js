@@ -11,12 +11,12 @@ const getProductAddPage=async(req,res)=>{
     try {
         const category=await Category.find({isListed:true});
         const brand=await Brand.find({isBlocked:false});
-        res.render("product-add",{
+        res.status(200).render("product-add",{
             cat:category,
             brand:brand
         })
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -24,10 +24,8 @@ const getProductAddPage=async(req,res)=>{
 const addProducts=async (req,res)=>{
     try {
         const products=req.body;
-        console.log("Received salesPrice:", products.salesPrice);
         const productExists=await Product.findOne({
             productName:products.productName,
-
         })
         if(!productExists){
             const images=[];
@@ -69,13 +67,13 @@ const addProducts=async (req,res)=>{
                 status:"Available",
             });
             await newProduct.save();
-            return res.redirect("/admin/products");
+            return res.status(201).redirect("/admin/products");
         }else{
             return res.status(400).json({message:"Product already exist, please try with another name"});
         }
     } catch (error) {
         console.error("Error saving product",error);
-        return res.redirect("/admin/pageerror")
+        return res.status(500).redirect("/admin/pageerror")
     }
 };
 
@@ -93,11 +91,12 @@ const getAllProducts=async (req,res)=>{
             ],
 
         })
+        .sort({createdAt:-1})
         .limit(limit*1)
         .skip((page-1)*limit)
         .populate("category")
         .exec();
-
+        console.log(productData)
         const count=await Product.find({
             $or:[
                 {productName:{$regex:new RegExp(".*"+search+".*","i")}},
@@ -116,12 +115,12 @@ const getAllProducts=async (req,res)=>{
                 brand:brand,
             })
         }else{
-            res.render("page-404");
+            res.status(404).render("page-404");
 
         }
 
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -130,9 +129,9 @@ const blockProduct=async (req,res)=>{
     try{
         let id=req.query.id;
         await Product.updateOne({_id:id},{$set:{isBlocked:true}});
-        res.redirect("/admin/products");
+        res.status(200).redirect("/admin/products");
     }catch(error){
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -141,9 +140,9 @@ const unblockProduct=async(req,res)=>{
     try{
         let id=req.query.id;
         await Product.updateOne({_id:id},{$set:{isBlocked:false}});
-        res.redirect("/admin/products");
+        res.status(200).redirect("/admin/products");
     }catch(error){
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -154,13 +153,13 @@ const getEditProduct=async(req,res)=>{
         const product=await Product.findOne({_id:id});
         const category=await Category.find({});
         const brand =await Brand.find({});
-        res.render("edit-product",{
+        res.status(200).render("edit-product",{
             product:product,
             cat:category,
             brand:brand,
         })
     } catch(error){
-        res.redirect("pageerror")
+        res.status(500).redirect("pageerror")
     }
 };
 
@@ -205,10 +204,10 @@ const editProduct = async (req, res) => {
 
       await Product.findByIdAndUpdate(id, updateQuery, { new: true }); 
       console.log("Update successful");
-      res.redirect("/admin/products");
+      res.status(200).redirect("/admin/products");
     } catch (error) {
       console.error(error);
-      res.redirect("/pageerror");
+      res.status(500).redirect("/pageerror");
     }
 };
   
@@ -228,7 +227,7 @@ const deleteSingleImage=async(req,res)=>{
         res.send({status:true});
 
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 

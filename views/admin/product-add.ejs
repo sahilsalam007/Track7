@@ -1,6 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 <head>
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@latest/dist/cropper.min.css">
+
 </head>
 <style>
    .error-message{
@@ -27,7 +28,7 @@
                    <h2 class="content-title">Add New Product</h2>
                </div>
            </div>
-           <div class="col-lg-6">
+           <div class="col-lg-12">
                <div class="card mb-4">
                    <div class="card-body">
                        <form method="post" action="/admin/addProducts" enctype="multipart/form-data"
@@ -128,7 +129,7 @@
                                </div>
                                <div class="row">
                                    <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                       <img src="" alt="" id="imgView1">
+                                       <img src="" alt=""  id="imgView1">
                                                                    <input class="form-control" type="file" name="images" id="input1"
                                                                        accept="image/png, image/jpeg, image/jpg"
                                                                        onchange="viewImage1(event), viewImage(event, 1)">
@@ -202,7 +203,7 @@
            </div>
        </div>
    </section>
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
      <script>
         function validateAndSubmit(){
             console.log("working")

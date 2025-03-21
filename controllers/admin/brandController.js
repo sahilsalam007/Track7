@@ -12,7 +12,7 @@ const getBrandPage=async (req,res)=>{
         const totalBrands=await Brand.countDocuments();
         const totalPages=Math.ceil(totalBrands/limit);
         const reverseBrand =brandData.reverse();
-        res.render("brands",{
+        res.status(200).render("brands",{
             data:reverseBrand,
             currentPage:page,
             totalPages:totalPages,
@@ -20,7 +20,7 @@ const getBrandPage=async (req,res)=>{
         })
     }
     catch(error){
-        res.redirect("/pageerror");
+        res.status(500).redirect("/pageerror");
     }
 };
 
@@ -36,10 +36,10 @@ const addBrand=async(req,res)=>{
                 brandImage:image
             })
             await newBrand.save();
-            res.redirect("/admin/brands")
+            res.status(201).redirect("/admin/brands")
         }
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -48,20 +48,21 @@ const blockBrand=async(req,res)=>{
     try {
         const id=req.query.id;
         await Brand.updateOne({_id:id},{$set:{isBlocked:true}});
-        res.redirect("/admin/brands");
+        res.status(200).redirect("/admin/brands");
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
+
 
 
 const unBlockBrand=async(req,res)=>{
     try {
         const id=req.query.id;
         await Brand.updateOne({_id:id},{$set:{isBlocked:false}});
-        res.redirect("/admin/brands");
+        res.status(200).redirect("/admin/brands");
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -73,13 +74,15 @@ const deleteBrand=async(req,res)=>{
             return res.status(400).redirect("/pageerror");
         }
         await Brand.deleteOne({_id:id});
-        res.redirect("/admin/brands")
+        res.status(200).redirect("/admin/brands")
     }
     catch(error){
         console.error("Error deleting brand:",error);
         res.status(500).redirect("/pageerror")
     }
 };
+
+
 
 
 module.exports={

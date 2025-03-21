@@ -31,7 +31,7 @@ const customerInfo=async(req,res)=>{
                 ],
              }).countDocuments();
              const totalPages = count > 0 ? Math.ceil(count / limit) : 1;
-             res.render("customers", { 
+             res.status(200).render("customers", { 
                 data: userData, 
                 totalPages: totalPages, 
                 currentPage: page 
@@ -49,9 +49,9 @@ const customerBlocked=async (req,res)=>{
         let id=req.query.id;
         await User.updateOne({_id:id},{$set:{isBlocked:true}});
         
-        res.redirect("/admin/users");
+        res.status(200).redirect("/admin/users");
     }catch(error){
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 
@@ -59,9 +59,9 @@ const customerBlocked=async (req,res)=>{
     try{
         let id=req.query.id;
         await User.updateOne({_id:id},{$set:{isBlocked:false}});
-        res.redirect("/admin/users")
+        res.status(200).redirect("/admin/users")
     }catch(error){
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 

@@ -103,9 +103,10 @@ const orderPlaced = async (req, res) => {
 
 const loadOrderSuccess = async (req,res) => {
     try {
-        res.render('order-success')
+        res.status(200).render('order-success')
     } catch (error) {
-        
+        console.error("Error loading order success page:", error);
+        res.status(500).render('error-page'); 
     }
 };
 
@@ -121,7 +122,7 @@ const viewOrders = async (req, res) => {
         .populate("address")
 
       
-        res.render("orders",{orders,})
+        res.status(200).render("orders",{orders,})
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).render('orders', { user: req.session.user, orders: [], error: "Failed to fetch orders." });
@@ -172,7 +173,7 @@ const cancelOrder = async (req,res) => {
           await Order.updateOne({ orderId: orderId }, { status: "Cancelled" });
           
         //   res.status(200).json({ message: "Order cancelled successfully" });
-          res.redirect('/orders')
+          res.status(200).redirect('/orders')
     
         
     } catch (error) {
@@ -200,7 +201,7 @@ const getOrderDetails = async (req,res) => {
 
         console.log(order)
         
-        res.render('order-details',{order})
+        res.status(200).render('order-details',{order})
 
     } catch (error) {
           console.error("Error fetching order details:", error);

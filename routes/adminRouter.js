@@ -28,8 +28,8 @@ router.get("/unblockCustomer",adminAuth,customerController.customerunBlocked);
 //category management
 router.get("/category",isSessionAdmin,adminAuth,categoryController.categoryInfo);
 router.post("/addCategory",isSessionAdmin,adminAuth,categoryController.addCategory);
-router.post("/addCategoryOffer",adminAuth,categoryController.addCategoryOffer);
-router.post("/removeCategoryOffer",adminAuth,categoryController.removeCategoryOffer);
+// router.post("/addCategoryOffer",adminAuth,categoryController.addCategoryOffer);
+// router.post("/removeCategoryOffer",adminAuth,categoryController.removeCategoryOffer);
 router.get("/listCategory",adminAuth,categoryController.getListCategory);
 router.get("/unlistCategory",adminAuth,categoryController.getUnlistCategory);
 router.get("/editCategory",adminAuth,categoryController.getEditCategory);

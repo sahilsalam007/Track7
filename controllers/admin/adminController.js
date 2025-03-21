@@ -4,9 +4,9 @@ const bcrypt=require("bcrypt");
 
 const loadLogin=(req,res)=>{
     if(req.session.admin){
-        return res.redirect("/admin/dashboard")
+        return res.status(302).redirect("/admin/dashboard")
     }
-    res.render("admin-login",{message:null})
+    res.status(200).render("admin-login",{message:null})
 };
 
 
@@ -20,16 +20,16 @@ const login=async(req,res)=>{
             const passwordMatch=await bcrypt.compare(password,admin.password);
             if(passwordMatch){
                 req.session.admin=true;
-                return res.redirect("/admin");
+                return res.status(200).redirect("/admin");
             }else{
-                return res.redirect("/admin/login")
+                return res.status(401).redirect("/admin/login")
             }
         }else{
-            return res.redirect("/login")
+            return res.status(403).redirect("/login")
         }
     }catch(error){
         console.log("login error",error)
-        return res.redirect("/pageerror")
+        return res.status(500).redirect("/pageerror")
     }
 };
 
@@ -37,16 +37,16 @@ const login=async(req,res)=>{
 const loadDashboard=async(req,res)=>{
     if(req.session.admin){
         try{
-            res.render("dashboard")
+            res.status(200).render("dashboard")
         }catch(error){
-            res.redirect("/pageerror")
+            res.status(500).redirect("/pageerror")
         }
     }
 };
 
 
  const pageerror=async(req,res)=>{
-    res.render("admin-error") 
+    res.status(500).render("admin-error") 
 };
 
 
@@ -55,13 +55,13 @@ const loadDashboard=async(req,res)=>{
         req.session.destroy(err=>{
             if(err){
                 console.log("Error destroying session",err);
-                return res.redirect("/pageerror")
+                return res.status(500).redirect("/pageerror")
             }
-            res.redirect("/admin/login")
+            res.status(200).redirect("/admin/login")
         })
     }catch(error){
         console.log("unexpected error during logout",error)
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 };
 

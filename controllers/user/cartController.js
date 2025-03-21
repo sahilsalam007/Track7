@@ -9,7 +9,7 @@ const getCartPage = async (req, res) => {
         const user = await User.findOne({ _id: id });
 
         if (!user) {
-            return res.redirect("/pageNotFound");
+            return res.status(404).redirect("/pageNotFound");
         }
         const productIds = user.cart.map((item) => item.productId);
         const products = await Product.find({ _id: { $in: productIds } });
@@ -136,30 +136,30 @@ const deleteProduct = async (req, res) => {
     try {
         const productId = req.query.id;
         if (!productId) {
-            return res.redirect("/pageNotFound");
+            return res.status(400).redirect("/pageNotFound");
         }
         const userId = req.session.user;
         if (!userId) {
-            return res.redirect("/pageNotFound");
+            return res.status(401).redirect("/pageNotFound");
         }
         const user = await User.findById(userId);
         if (!user) {
-            return res.redirect("/pageNotFound");
+            return res.status(404).redirect("/pageNotFound");
         }
         const cartIndex = user.cart.findIndex(
             (item) => item.productId.toString() === productId.toString()
         );
 
         if (cartIndex === -1) {
-            return res.redirect("/cart");
+            return res.status(404).redirect("/cart");
         }
 
         user.cart.splice(cartIndex, 1);
         await user.save();
-        res.redirect("/cart");
+        res.status(200).redirect("/cart");
 
     } catch (error) {
-        res.redirect("/pageNotFound");
+        res.status(500).redirect("/pageNotFound");
     }
 };
 
@@ -241,7 +241,7 @@ const moveAllToCart=async(req,res)=>{
         const user=await User.findById(userId);
 
     if(!user || user.wishlist.length === 0){
-        return res.json({status:"error",message:"Wishlist is empty or user not found."});
+        return res.status(404).json({status:"error",message:"Wishlist is empty or user not found."});
     }
     for(let wishlistPorductId of user.wishlist){
         const product=await Product.findById(wishlistPorductId).lean();
@@ -272,7 +272,7 @@ const moveAllToCart=async(req,res)=>{
     }
     user.wishlist=[];
     await user.save();
-    res.json({status :"success",message:"All items moved to cart."});
+    res.status(200).json({status :"success",message:"All items moved to cart."});
     } catch (error) {
         res.status(500).json({status:"error",message:"Internal server error"});
     }
