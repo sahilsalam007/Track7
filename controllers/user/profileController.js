@@ -172,7 +172,8 @@ const userProfile=async (req,res)=>{
 
 const changeEmail=async (req,res)=>{
     try {
-        res.render("change-email")
+        const user = await User.findOne({_id:req.session.user});
+        res.render("change-email",{user})
     } catch (error) {
         res.redirect("/pageNotFound")
     }
@@ -244,7 +245,8 @@ const updateEmail=async (req,res)=>{
 
 const changePassword =async(req,res)=>{
     try {
-        res.render("change-password");
+        const user = await User.findOne({_id:req.session.user});
+        res.render("change-password",{user});
 
     } catch (error) {
         res.redirect("/pageNotFound")
@@ -255,6 +257,7 @@ const changePassword =async(req,res)=>{
 const changePasswordValid=async(req,res)=>{
     try {
         const {email}=req.body;
+        console.log(email)
         const userExists=await User.findOne({email});
         if(userExists){
             const otp=generateOtp();

@@ -115,14 +115,23 @@ const viewOrders = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        console.log(userId)
+        const limit=5;
+        let page=1;
+        if(req.query.page){
+           page=Number(req.query.page) ||1
+        }
+        const skip = (page-1) * limit;
+        
+        const totalOrder=await Order.countDocuments({userId:userId})
+        const totalPages = Math.ceil(totalOrder/limit)
         const orders=await Order.find({userId:userId})
         .populate('userId')
         .populate('orderedItems.product').sort({ createdOn: -1 })
         .populate("address")
-
+        .skip(skip)
+        .limit(limit)
       
-        res.status(200).render("orders",{orders,})
+        res.status(200).render("orders",{orders,totalPages,currentPage:page})
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).render('orders', { user: req.session.user, orders: [], error: "Failed to fetch orders." });

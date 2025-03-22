@@ -200,6 +200,19 @@
             <% }); %>
         <% } %>
 
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <% if (typeof totalPages !== "undefined" && typeof currentPage !== "undefined") { %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
+                            <a class="page-link rounded-pill" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                <% } %>
+            </ul>
+        </nav>
+
     </div>
 </body>
 </html>

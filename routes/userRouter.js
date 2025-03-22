@@ -68,7 +68,7 @@ router.get("/deleteItem",userAuth,cartController.deleteProduct)
 router.post("/changeQuantity",userAuth,cartController.changeQuantity);
 router.post("/wishlist/moveAlltoCart",userAuth,cartController.moveAllToCart);
 //prdt rot
-router.get("/productDetails",userAuth,productController.productDetails);
+router.get("/productDetails",userAuth,session,productController.productDetails);
 
 //checkout Rot
 router.get('/checkOut',userAuth,checkOutController.getCheckOut)
@@ -78,7 +78,7 @@ router.post('/edit-address',userAuth,checkOutController.editaddress)
 //order Mngt
 router.post('/orderPlaced',userAuth,orderController.orderPlaced)
 router.get('/order-success',userAuth,orderController.loadOrderSuccess)
-router.get('/orders',session,userAuth,orderController.viewOrders)
+router.get('/orders',userAuth,session,orderController.viewOrders)
 router.post('/cancel-order/:orderId',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 

@@ -8,7 +8,7 @@ const productDetails = async (req, res) => {
   try {
     const userId = req.session.user._id;
     //const userData = await User.findById(userId)
-    const userData = userId ? await User.findById(userId) : null;
+
     const productId = req.query.id;
     const product = await Product.findById(productId)
       .populate("category")
@@ -21,7 +21,7 @@ const productDetails = async (req, res) => {
     }).limit(3);
 
     res.render("product-details", {
-      user: userData,
+      user: res.locals.user,
       product: product,
       quantity: product.quantity,
       category: findCategory,

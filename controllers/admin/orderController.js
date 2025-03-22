@@ -12,7 +12,7 @@ const getorderDetails = async (req,res) => {
                 path:'orderedItems.product',select:'productName productImage price'
             }); 
         if (!order) {
-            return res.status(404).status(404).render('admin/error', { message: 'Order not found' });
+            return res.status(404).render('admin/error', { message: 'Order not found' });
         }
         // console.log('order data:',order)
         // console.log('order Items:',order.orderedItems)

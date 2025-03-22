@@ -52,10 +52,15 @@ const adminAuth=(req,res,next)=>{
 };
 
 
-const session=((req, res, next) => {
-    res.locals.user = req.session.user || null;  // Set user from session
-    next();
-});
+const session=async(req, res, next) => {
+    try{
+        const user=await User.findById(req.session.user)
+        res.locals.user = user || null;  // Set user from session
+        next();
+    }catch(error){
+        console.log(error.message)
+    }
+};
 
 module.exports={
     userAuth,

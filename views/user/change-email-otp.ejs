@@ -93,7 +93,7 @@
            <div class="otp-timer">
                <span id="otpTimer">OTP Expires in: 1:00</span>
            </div>
-           <button type="button" onclick="resendOTP()" class="resend-btn">Resend OTP</button>
+           <button type="button" onclick="resendOTP()" id="resend-otp" class="resend-btn">Resend OTP</button>
            <% if (locals.message && message.length > 0) { %>
                <div class="alert alert-danger mt-3">
                    <%= message %>
@@ -105,9 +105,12 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+  const resendButton = document.getElementById('resend-otp');
+
  function startOTPTimer(durationInSeconds) {
    let timer = durationInSeconds;
    const timerElement = document.getElementById('otpTimer');
+   resendButton.disabled=true;
    const countdown = setInterval(function () {
      const minutes = Math.floor(timer / 60);
      const seconds = timer % 60;
@@ -118,6 +121,7 @@
 
      if (--timer < 0) {
        clearInterval(countdown);
+     resendButton.disabled=false;
        timerElement.textContent = 'OTP Expired';
      }
    }, 1000);
