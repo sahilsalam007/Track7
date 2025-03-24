@@ -1,4 +1,5 @@
 const User=require("../models/userSchema");
+const mongoose=require('mongoose');
 
 
 const userAuth = (req, res, next) => {
@@ -6,8 +7,7 @@ const userAuth = (req, res, next) => {
         User.findById(req.session.user)
             .then(data => {
                 if (data && !data.isBlocked) {
-                    req.user = data;  // ✅ Set req.user with the user object
-                 // Debug log
+                    req.user = data;
                     next();
                 } else {
                     res.redirect("/login");
@@ -37,11 +37,13 @@ const isSessionAdmin=(req,res,next)=>
     
 
 const adminAuth=(req,res,next)=>{
-    User.findOne({isAdmin:true})
-    .then(data=>{
-        if(data){
+   if(req.session.admin && mongoose.Types.ObjectId.isValid(req.session.admin)){
+     User.findById(req.session.admin)
+    .then((admin)=>{
+        if(admin){
             next();
         }else{
+            req.session.destroy();
             res.redirect("/admin/login")
         }
     })
@@ -49,13 +51,18 @@ const adminAuth=(req,res,next)=>{
         console.log("Error in adminAuth middleware",error);
         res.status(500).send("Internal Server Error")
     })
+}else{
+    
+    res.redirect("/admin/login")
+}
 };
+
 
 
 const session=async(req, res, next) => {
     try{
         const user=await User.findById(req.session.user)
-        res.locals.user = user || null;  // Set user from session
+        res.locals.user = user || null; 
         next();
     }catch(error){
         console.log(error.message)

@@ -55,7 +55,6 @@ const blockBrand=async(req,res)=>{
 };
 
 
-
 const unBlockBrand=async(req,res)=>{
     try {
         const id=req.query.id;
