@@ -2,7 +2,7 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Brand = require('../../models/brandSchema')
-const Wishlist = require("../../models/wishlistschema")
+const Wishlist = require("../../models/wishlistSchema")
 
 const productDetails = async (req, res) => {
   try {

@@ -20,4 +20,4 @@ const wishlistSchema=new Schema({
 })
 
 const Wishlist=mongoose.model("Wishlist",wishlistSchema);
-module.exorts=Wishlist;
+module.exports=Wishlist;

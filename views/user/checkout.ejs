@@ -1,4 +1,6 @@
 <%- include("../../views/partials/user/header") %>
+<head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
     <style>
         :root {
             --primary: #2A2F4F;
@@ -242,12 +244,30 @@
                 </div>
                 <div class="checkout-section mt-4">
                     <h3 class="mb-4">Payment Method</h3>
-                    <div class="payment-method selected">
-                        <input class="form-check-input" type="radio" name="paymentMethod" value="COD" checked>
+                    <div class="payment-method"  >
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="COD" >
                         <i class="fas fa-hand-holding-usd fa-2x"></i>
                         <div>
                             <h5>Cash on Delivery</h5>
                             <p class="text-muted">Pay when you receive your order</p>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-method"  >
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="razorpay" >
+                        <i class="fas fa-credit-card fa-2x"></i>
+                        <div>
+                            <h5>Online Payment (Razorpay)</h5>
+                            <p class="text-muted">Secure online payment</p>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-method"  >
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="wallet">
+                        <i class="fas fa-wallet fa-2x"></i>
+                        <div>
+                            <h5>Wallet Payment</h5>
+                            <p class="text-muted">Use available balance</p>
                         </div>
                     </div>
                 </div>

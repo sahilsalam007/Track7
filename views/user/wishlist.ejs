@@ -1,0 +1,218 @@
+ 
+<%- include("../../views/partials/user/header") %> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --secondary-color: #ff006e;
+            --accent-color: #8338ec;
+            --light-bg: #f8f9fa;
+            --dark-text: #212529;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        .wishlist-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 15px;
+        }
+
+        .wishlist-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .wishlist-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: var(--card-shadow);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .wishlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .product-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .current-price {
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .add-to-cart:hover {
+            background: var(--accent-color);
+        }
+
+        .remove-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #cc0000;
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wishlist-container">
+        <div class="wishlist-header">
+            <h1>My Wishlist</h1>
+            <p>Your saved favorite items</p>
+        </div>
+
+        <% if (wishlist.length > 0) { %>
+            <div class="wishlist-grid">
+                <% wishlist.forEach(item => { %>
+                    <div class="wishlist-card">
+                        <img src="/uploads/re-image/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title"><%= item.productId.productName %></h3>
+                            <div class="price-section">
+                                <span class="current-price">₹<%= item.productId.salesPrice %></span>
+                                <span class="original-price">₹<%= item.productId.regularPrice %></span>
+                            </div>
+                            <div class="action-buttons">
+                                <a class="btn add-to-cart" href="/productDetails?id=<%=item.productId._id%>">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </a>
+                                <button class="btn remove-btn" onclick="removeFromWishlist('<%= item.productId._id %>')">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-wishlist">
+                <i class="fas fa-heart-broken fa-3x"></i>
+                <p>Your wishlist is empty</p>
+            </div>
+        <% } %>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+   
+        function removeFromWishlist(productId) {
+            fetch("/remove-wishlist", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Removed!",
+                        text: "Product removed from wishlist.",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops!",
+                        text: "Error removing product from wishlist.",
+                        confirmButtonColor: "#d33"
+                    });
+                }
+            });
+        }
+    </script>
+    
+
+<%- include("../../views/partials/user/footer") %> 

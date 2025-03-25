@@ -10,6 +10,7 @@ const {session}=require("../middlewares/auth")
 const cartController=require("../controllers/user/cartController");
 const Address = require("../models/addressSchema");
 const orderController=require("../controllers/user/orderController");
+const wishlistController=require("../controllers/user/wishlistController");
 
 //err and page navigation
 router.get("/pageNotFound",userController.pageNotFound);
@@ -17,7 +18,7 @@ router.get("/",userController.loadHomepage);
 router.get("/shop",userAuth,session,userController.loadShoppingPage);
 
 
-//gogleauth
+//googleauth
 router.get("/auth/google",passport.authenticate("google",{scope:["profile","email"]}));
 router.get("/auth/google/callback",passport.authenticate("google",{failureRedirect:"/signup"}),(req,res)=>{
     req.session.user=req.user._id;
@@ -82,6 +83,10 @@ router.get('/orders',userAuth,session,orderController.viewOrders)
 router.post('/cancel-order/:orderId',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 
-   
+
+//wishList management
+router.get("/wishlist",userAuth,wishlistController.getWishlist);
+router.post("/wishlist/add",userAuth,wishlistController.addToWishlist);
+router.delete("/remove-wishlist",userAuth,wishlistController.removeWishlist);
 
 module.exports=router;

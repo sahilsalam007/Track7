@@ -246,6 +246,8 @@ const loadShoppingPage = async (req, res) => {
             minPrice: req.query.minPrice || ''
         };
 
+        console.log(query)
+
         const filter = {
             isBlocked: false,
             status: "Available"

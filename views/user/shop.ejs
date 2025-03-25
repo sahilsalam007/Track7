@@ -401,7 +401,24 @@
     text-decoration: none; /* Removes the underline */
 }
 
+.filter-checkbox {
+  width: 14px; /* Adjust the size */
+  height: 14px;
+  transform: scale(0.8); /* Optionally scale down */
+}
+.apply-filters-btn {
+    background-color: #b02a37;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
+.apply-filters-btn:hover {
+    background-color: #d24554;
+}
 
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -420,7 +437,7 @@
             class="search-input">
           <button type="submit" class="search-button">Search</button>
         </form>
-        <form action="" method="GET" id="sortForm">
+        <form action="/shop" method="GET" id="sortForm">
           <% if(query.category) { %>
             <input type="hidden" name="category" value="<%= query.category %>">
             <% } %>
@@ -444,43 +461,59 @@
 
       <div class="product-list-container">
         <aside class="sidebar">
-          <a href="/shop" class="clear-filter-btn">
-            Clear All Filters
-          </a>
+          <form action="/shop" method="GET" id="filter-form">
+          <a href="/shop" class="clear-filter-btn">Clear All Filters</a>
+        
+          <!-- Categories Filter -->
           <div class="filter-section">
             <h3 class="filter-title">Categories</h3>
             <div class="filter-items">
-              <% categories.forEach(category=> { %>
+              <% categories.forEach(category => { %>
                 <div class="filter-item">
-                  <a href="?category=<%= category._id %>&sort=<%= query.sort %>&search=<%= query.search %>">
-                    <%= category.name %>
-                  </a>
+                  <input type="checkbox" class="filter-checkbox" name="category" value="<%= category._id %>"
+                    <% if (query.category && query.category.includes(category._id)) { %> checked <% } %> />
+                  <label><%= category.name %></label>
                 </div>
-                <% }) %>
+              <% }) %>
             </div>
           </div>
+        
+          <!-- Brands Filter -->
           <div class="filter-section">
             <h3 class="filter-title">Brands</h3>
             <div class="filter-items">
-              <% brands.forEach(brand=> { %>
+              <% brands.forEach(brand => { %>
                 <div class="filter-item">
-                  <a href="?brand=<%= brand.brandName %>&sort=<%= query.sort %>&search=<%= query.search %>">
-                    <%= brand.brandName %>
-                  </a>
+                  <input type="checkbox" class="filter-checkbox" name="brand" value="<%= brand.brandName %>"
+                    <% if (query.brand && query.brand.includes(brand.brandName)) { %> checked <% } %> />
+                  <label><%= brand.brandName %></label>
                 </div>
-                <% }) %>
+              <% }) %>
             </div>
           </div>
+        
+          <!-- Price Range Filter -->
           <div class="filter-section">
             <h3 class="filter-title">Price Range</h3>
             <div class="price-filters">
-              <button type="button" class="price-button" onclick="filterPrice(0, 500)">Under ₹500</button>
-              <button type="button" class="price-button" onclick="filterPrice(500, 1000)">₹500 - ₹1000</button>
-              <button type="button" class="price-button" onclick="filterPrice(1000, 1500)">₹1000 - ₹1500</button>
-              <button type="button" class="price-button" onclick="filterPrice(1500, null)">Above ₹1500</button>
+              <input type="checkbox" class="filter-checkbox" name="price" value="0-500" />
+              <label>Under ₹500</label>
+        
+              <input type="checkbox" class="filter-checkbox" name="price" value="500-1000" />
+              <label>₹500 - ₹1000</label>
+        
+              <input type="checkbox" class="filter-checkbox" name="price" value="1000-1500" />
+              <label>₹1000 - ₹1500</label>
+        
+              <input type="checkbox" class="filter-checkbox" name="price" value="1500-null" />
+              <label>Above ₹1500</label>
             </div>
           </div>
+        
+          <button class="apply-filters-btn">Apply Filters</button>
+        </form>
         </aside>
+        
 
         <main class="product-grid">
           <% if (products.length===0) { %>
