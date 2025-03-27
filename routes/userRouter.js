@@ -88,5 +88,6 @@ router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 router.get("/wishlist",userAuth,wishlistController.getWishlist);
 router.post("/wishlist/add",userAuth,wishlistController.addToWishlist);
 router.delete("/remove-wishlist",userAuth,wishlistController.removeWishlist);
-
+router.post('/create-razorpay-order', orderController.createRazorpayOrder);
+router.post('/verify-razorpay-payment', orderController.verifyRazorpayPayment);
 module.exports=router;

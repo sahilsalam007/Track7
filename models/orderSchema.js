@@ -52,11 +52,7 @@ const orderSchema=new Schema({
     invoiceDate:{
         type:Date
     },
-    status:{
-        type:String,
-        required:true,
-        enum:["Pending","Processing","Shipped","Delivered","Cancelled","Return Request","Returned"]
-    },
+   
     createdOn:{
         type:Date,
         default:Date.now,
@@ -66,11 +62,28 @@ const orderSchema=new Schema({
         type:Boolean,
         default:false
     },
-    paymentMethod: {
+    payment: {
+        method: {
+            type: String,
+            enum: ["cod", "razorpay","wallet"],
+            default: "cod"
+        },
+        status: {
+            type: String,
+            enum: ["Pending", "paid", "failed", "refunded", "processing", "Processing"], // Added "Processing"
+            default: "Pending"
+        },
+        razorpayDetails: {
+            paymentId: String,
+            orderId: String,
+            signature: String
+        }
+    },
+    status: {
         type: String,
-        required: true,
-        default:"COD"
-    }
+        enum: ["Pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "return-requested", "returned", "Processing","paid","completed"], // Added "Processing"
+        default: "pending"
+    },
 })
 const Order=mongoose.model("Order",orderSchema);
 module.exports=Order;

@@ -4,6 +4,7 @@ const Cart = require('../../models/cartSchema')
 const Product = require('../../models/productSchema')
 const mongoose = require('mongoose')
 const { CURSOR_FLAGS } = require('mongodb')
+require('dotenv').config()
 
 
 
@@ -33,7 +34,8 @@ const getCheckOut = async (req, res) => {
             addresses: userAddresses ? userAddresses.address : [],
             title: 'Checkout',
             user,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            razorpayKeyId: process.env.RAZORPAY_KEY_ID // Pass Razorpay key
         })
 
     } catch (error) {
