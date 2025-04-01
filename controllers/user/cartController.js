@@ -3,6 +3,7 @@ const Product =require("../../models/productSchema");
 const mongodb =require("mongodb");
 const mongoose = require("mongoose");
 
+
 const getCartPage = async (req, res) => {
     try {
         const id = req.session.user;
@@ -53,6 +54,7 @@ const getCartPage = async (req, res) => {
         res.redirect("/pageNotFound");
     }
 };
+
 
 const addToCart = async (req, res) => {
     try {
@@ -132,6 +134,7 @@ const addToCart = async (req, res) => {
     }
 };
 
+
 const deleteProduct = async (req, res) => {
     try {
         const productId = req.query.id;
@@ -162,6 +165,7 @@ const deleteProduct = async (req, res) => {
         res.status(500).redirect("/pageNotFound");
     }
 };
+
 
 const changeQuantity = async (req, res) => {
     try {
@@ -235,6 +239,7 @@ const changeQuantity = async (req, res) => {
     }
 };
 
+
 const moveAllToCart=async(req,res)=>{
     try {
         const userId=req.session.user;
@@ -277,6 +282,7 @@ const moveAllToCart=async(req,res)=>{
         res.status(500).json({status:"error",message:"Internal server error"});
     }
 };
+
 
 module.exports={
     getCartPage,

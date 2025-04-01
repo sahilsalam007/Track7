@@ -4,6 +4,7 @@ const Address=require("../../models/addressSchema")
 const bcrypt=require("bcrypt");
 const env=require("dotenv").config();
 const session=require("express-session");
+const Wallet=require("../../models/walletSchema");
 
 
 function generateOtp(){
@@ -158,10 +159,12 @@ const userProfile=async (req,res)=>{
     try {
         const userId=req.session.user;
         const userData=await User.findById(userId);
-        const addressData=await Address.findOne({userId:userId})
+        const addressData=await Address.findOne({userId:userId});
+        const wallet=await Wallet.findOne({userId}) || {balance:0,transactions:[]};
         res.render("profile",{
             user:userData,
-            userAddress:addressData
+            userAddress:addressData,
+            wallet:wallet
         })
     } catch (error) {
         console.error("Error for retrieve profile data",error);

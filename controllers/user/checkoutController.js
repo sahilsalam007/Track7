@@ -1,6 +1,7 @@
 const User = require('../../models/userSchema')
 const Address = require('../../models/addressSchema')
 const Cart = require('../../models/cartSchema')
+const Coupon = require('../../models/couponSchema')
 const Product = require('../../models/productSchema')
 const mongoose = require('mongoose')
 const { CURSOR_FLAGS } = require('mongodb')
@@ -28,14 +29,18 @@ const getCheckOut = async (req, res) => {
         if (cart) {
             totalPrice = cart.reduce((sum, item) => sum + (item.productId.salesPrice * item.quantity), 0)
         }
+        const taxAmount=totalPrice*0.10;
+        let coupons=await Coupon.find();
 
         res.status(200).render('checkout', {
             cart,
             addresses: userAddresses ? userAddresses.address : [],
             title: 'Checkout',
             user,
+            coupons,
             totalPrice: totalPrice,
-            razorpayKeyId: process.env.RAZORPAY_KEY_ID // Pass Razorpay key
+            taxAmount:taxAmount,
+            razorpayKeyId: process.env.RAZORPAY_KEY_ID 
         })
 
     } catch (error) {

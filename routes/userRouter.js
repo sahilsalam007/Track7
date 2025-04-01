@@ -6,11 +6,13 @@ const profileController=require("../controllers/user/profileController")
 const productController=require("../controllers/user/productController");
 const checkOutController = require('../controllers/user/checkoutController')
 const {userAuth} = require("../middlewares/auth");
-const {session}=require("../middlewares/auth")
+const {session}=require("../middlewares/auth");
+const couponController = require('../controllers/user/couponController')
 const cartController=require("../controllers/user/cartController");
 const Address = require("../models/addressSchema");
 const orderController=require("../controllers/user/orderController");
 const wishlistController=require("../controllers/user/wishlistController");
+const walletController=require("../controllers/user/walletController");
 
 //err and page navigation
 router.get("/pageNotFound",userController.pageNotFound);
@@ -76,11 +78,19 @@ router.get('/checkOut',userAuth,checkOutController.getCheckOut)
 router.post('/add-address',userAuth,checkOutController.addaddress)
 router.post('/edit-address',userAuth,checkOutController.editaddress)
 
+//coupon management 
+router.post('/apply-coupon',userAuth,couponController.applyCoupon)
+router.post('/remove-coupon',userAuth,couponController.removeCoupon)
+
+//wallet 
+router.post("/walletPayment",userAuth,orderController.walletPayment)
+router.get('/wallet',userAuth,walletController.getWallet)
+
 //order Mngt
 router.post('/orderPlaced',userAuth,orderController.orderPlaced)
 router.get('/order-success',userAuth,orderController.loadOrderSuccess)
 router.get('/orders',userAuth,session,orderController.viewOrders)
-router.post('/cancel-order/:orderId',userAuth,orderController.cancelOrder)
+router.post('/cancel-order',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 
 

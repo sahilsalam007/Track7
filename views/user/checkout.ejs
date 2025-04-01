@@ -276,20 +276,63 @@
             <div class="col-lg-4">
                 <div class="checkout-section">
                     <h3 class="mb-4">Price Details</h3>
+                    <div class="available-coupons mb-3">
+                        <!-- Available coupons section -->
+                        <h5>Available Coupons</h5>
+                         <ul id="couponList" class="list-group">
+                        <% if (coupons && coupons.length > 0) { %>
+                            <% coupons.forEach(coupon => { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <strong><%= coupon.name %></strong> - ₹<%= coupon.offerPrice %> OFF
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="applySelectedCoupon('<%= coupon.name %>','<%= coupon.offerPrice %>' )">Apply</button>
+                                </li>
+                            <% }); %>
+                        <% } else { %>
+                            <li class="list-group-item text-muted">No available coupons</li>
+                        <% } %>
+                    </ul>
+                    </div>
+                    
+                    <!-- Coupon Input Section -->
+                    <div class="coupon-section mb-3">
+                        <div id="couponInputGroup" class="d-flex gap-2">
+                            <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code">
+                            <button onclick="applyCoupon()" class="btn btn-sm mt-2">Apply</button>
+                        </div>
+                        <div id="appliedCoupon" style="display: none;" class="mt-2">
+                            <span>Applied Coupon: <strong id="appliedCouponCode"></strong></span>
+                            <button onclick="removeCoupon()" class="btn btn-link btn-sm text-danger">Remove</button>
+                        </div>
+                        <p id="couponMessage" class="mt-2 text-danger" style="display: none;"></p>
+                    </div>
                     <div class="summary-item">
                         <span>Price (<%= cart ? cart.items : 0 %> items)</span>
                         <span>₹<%=totalPrice%></span>
                     </div>
                     <div class="summary-item">
                         <span>Discount</span>
-                        <span class="text-success">-99</span>
+                        <span id="discountAmount" class="text-success">
+                            -₹
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Tax (10%)</span>
+                        <span id="taxAmount">₹<%= taxAmount.toFixed(2) %></span>
                     </div>
                     <div class="summary-total">
                         <span>Total Amount</span>
-                        <span>₹<%= (totalPrice ? totalPrice -99 : 0) %></span>
-                        <input type="hidden" id="totalPriceValue" value="<%= totalPrice ? totalPrice  : 0 %>">
+                        <span id="finalPrice">₹<%= totalPrice + taxAmount%></span>
+                        <input type="hidden" id="totalPriceValue" value="<%= totalPrice ? totalPrice : 0 %>">
+                        <input type="hidden" id="taxAmountValue" value="<%= taxAmount ? taxAmount : 0 %>">
                     </div>
-                    <button onclick="placeOrder('<%= user._id %>')" class="btn ">Place Order</button>
+        
+               
+                    <button class="btn" onclick="placeOrder('<%= user._id %>', '<%= totalPrice %>', '<%= coupons.length ? coupons[0].offerPrice : 0 %>', '<%= taxAmount %>')">
+
+                                Place Order
+                            </button>
                 </div>
             </div>
         </div>
@@ -344,6 +387,7 @@
                 name: "Your Store Name",
                 description: "Order Payment",
                 order_id: orderResult.order.id,
+                retry:false,
                 handler: async function (response) {
                     const verifyResponse = await fetch("/verify-razorpay-payment", {
                         method: "POST",
@@ -426,35 +470,46 @@
                 alert("An error occurred while placing the order.");
             }
         } else if (paymentMethod.value === 'wallet') {
-            // Add Wallet payment logic here
-            alert("Wallet payment is not yet implemented.");
-            // Example:
-            /*
-            try {
-                const response = await fetch("/orderWithWallet", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        userId: userId,
-                        addressId: addressId,
-                        totalPrice: totalPrice,
-                        paymentMethod: "wallet"
-                    })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    alert("Order placed successfully with wallet!");
-                    window.location.href = "/order-success";
-                } else {
-                    alert(result.error || "Failed to place order with wallet.");
-                }
-            } catch (error) {
-                console.error("Error placing order with wallet:", error);
-                alert("An error occurred while placing the order with wallet.");
+             try{
+             const response = await fetch("/walletPayment", {
+                 method: "POST",
+                 headers: { "Content-Type": "application/json" },
+                 body: JSON.stringify({
+                     userId: userId,
+                     addressId: selectedAddress,
+                     amount: totalPrice,
+                     paymentMethod: paymentMethod.value, 
+                 })
+             });
+ 
+             const result = await response.json();
+             if (result.success) {
+                 Swal.fire({
+                     icon: "success",
+                     title: "Order Placed!",
+                     text: "Payment was successful using wallet.",
+                 }).then(() => {
+                     window.location.href = "/order-success";
+                 });
+             } else {
+                 Swal.fire({
+                     icon: "error",
+                     title: "Payment Failed",
+                     text: result.error || "Insufficient wallet balance.",
+                 });
+             }
             }
-            */
-        }
-    }
+        
+ 
+      catch (error) {
+         Swal.fire({
+             icon: "error",
+             title: "An Error Occurred",
+             text: "Something went wrong while placing the order.",
+         });
+     }
+ }
+}
     
     function editAddress(index, id, name, addressType, city, landMark, state, pincode, phone) {
         document.getElementById("addressIndex").value = index;
@@ -511,6 +566,85 @@
             }
         });
     });
+
+    //coupon
+    let appliedCouponCode=null;
+    async function applyCoupon(){
+        const couponCode=document.getElementById("couponCode").value.trim();
+        if(!couponCode){
+            showCouponMessage("Please eneter a coupon code","red");
+            return;
+        }
+        try{
+            const response=await fetch("/apply-coupon",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({couponCode})
+            });
+            const result=await response.json();
+            if(result.success){
+                appliedCouponCode=couponCode;
+                updatePriceDisplay(result.discount,result.finalPrice);
+                showCouponUI(couponCode);
+                showCouponMessage("Coupon applied successfully!","green");
+            }else{
+                showCouponMessage(result.message,"green");
+            }
+        }catch(error){
+            showCouponMessage("Failed to apply coupon","red");
+        }
+    }
+
+    async function removeCoupon(){
+        if(!appliedCouponCode)return;
+        try {
+            const response=await fetch("/remove-coupon",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({couponCode:appliedCouponCode})
+            });
+            const result=await response.json();
+            if(result.success){
+                appliedCouponCode=null;
+                resetCouponUI();
+                showCouponMessage("Coupon removed successfully!","green");
+            }
+        } catch (error) {
+            showCouponMessage("Failed to remove Coupon","red");
+        }
+    }
+    function applySelectedCoupon(couponCode){
+        document.getElementById("couponCode").value=couponCode;
+    }
+    function updatePriceDisplay(discount,finalPrice){
+        const taxAmount=parseFloat(document.getElementById("taxAmountValue").value);
+        document.getElementById("discountAmount").textContent=`₹${discount}`;
+        document.getElementById("finalPrice").textContent=`₹${finalPrice + taxAmount}`;
+    }
+    function showCouponUI(couponCode){
+        document.getElementById("couponInputGroup").style.display="none";
+        document.getElementById("appliedCoupon").style.display="block";
+        document.getElementById("appliedCouponCode").textContent=couponCode;
+    }
+    function resetCouponUI(){
+        const totalPrice=parseFloat(document.getElementById("totalPriceValue").value);
+        const taxAmount=parseFloat(document.getElementById("taxAmountValue").value);
+
+        document.getElementById("couponInputGroup").style.display = "flex";
+        document.getElementById("appliedCoupon").style.display = "none";
+        document.getElementById("couponCode").value = "";
+        document.getElementById("discountAmount").textContent = "₹0";
+        document.getElementById("finalPrice").textContent = `₹${(totalPrice + taxAmount).toFixed(2)}`;
+    }
+    function showCouponMessage(message,color){
+        const messageElement=document.getElementById("couponMessage");
+        messageElement.textContent=message;
+        messageElement.style.color=color;
+        messageElement.style.display="block";
+        setTimeout(()=>messageElement.style.display="none",3000);
+    }
     </script>
+
+
 
     <%- include("../../views/partials/user/footer") %>
