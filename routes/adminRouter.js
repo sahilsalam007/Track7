@@ -8,9 +8,11 @@ const orderController=require("../controllers/admin/orderController");
 const multer=require("multer");
 const storage=require("../helpers/multer");
 const uploads=multer({storage});
+const walletController=require("../controllers/admin/walletController");
 const brandController=require("../controllers/admin/brandController");
 const productController=require("../controllers/admin/productController");
-const couponController=require("../controllers/admin/couponController")
+const couponController=require("../controllers/admin/couponController");
+
 
 // admins auth
 router.get("/pageerror",adminController.pageerror);
@@ -68,5 +70,11 @@ router.post("/createCoupon",adminAuth,couponController.createCoupon);
 router.get("/editCoupon",adminAuth,couponController.editCoupon);
 router.post("/updateCoupon",adminAuth,couponController.updateCoupon);
 router.get("/deleteCoupon",adminAuth,couponController.deleteCoupon);
+
+// wallet management
+router.get("/wallet",adminAuth,walletController.getWallet);
+router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
+
+
 
 module.exports=router;
