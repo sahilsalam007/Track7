@@ -12,6 +12,7 @@ const walletController=require("../controllers/admin/walletController");
 const brandController=require("../controllers/admin/brandController");
 const productController=require("../controllers/admin/productController");
 const couponController=require("../controllers/admin/couponController");
+const salesController=require("../controllers/admin/salesController");
 
 
 // admins auth
@@ -74,6 +75,9 @@ router.get("/deleteCoupon",adminAuth,couponController.deleteCoupon);
 // wallet management
 router.get("/wallet",adminAuth,walletController.getWallet);
 router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
+
+//sales report management
+router.get("/sales-report",isSessionAdmin,adminAuth,salesController.getSalesReport);
 
 
 

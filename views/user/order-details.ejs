@@ -182,7 +182,7 @@
     <% if (order) { %>
             <div class="order-section">
                 <div class="order-header">
-                    <h2 class="order-id">Order #<%= order.orderId %></h2>
+                    <h2 class="order-id">Order #<%= order.orderId.slice(0,12) %></h2>
                     <span class="order-status status-<%= order.status.toLowerCase().replace(' ', '-') %>">
                         <%= order.status %>
                     </span>
@@ -217,7 +217,8 @@
                     <% } %>
                     <div class="detail-item total-price">
                         <span>Final Amount:</span>
-                        <span>₹<%= order.finalAmount.toFixed(2) %></span>
+                        <span>₹<%= (order.finalAmount * 1.1).toFixed(2) %></span>
+
                     </div>
                 </div>
                 <div class="shipping-address">

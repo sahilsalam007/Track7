@@ -1,23 +1,25 @@
 const User=require("../../models/userSchema");
 const Wishlist=require("../../models/wishlistSchema")
 
-const getWishlist=async(req,res)=>{
-    try {
-        const userId=req.session.user;
-        const wishlist=await Wishlist.findOne({userId})
-        .populate({
-            path:"products.productId",
-        });
-        console.log(wishlist.products[0].productId)
 
-        res.render("wishlist",{
-            wishlist:wishlist ? wishlist.products : [],
+const getWishlist = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const wishlist = await Wishlist.findOne({ userId })
+            .populate({
+                path: "products.productId",
+            });
+
+        const wishlistProducts = wishlist && wishlist.products ? wishlist.products : [];
+
+        res.render("wishlist", {
+            wishlist: wishlistProducts,
         });
     } catch (error) {
-        console.error("Error fetching wishlist:",error);
+        console.error("Error fetching wishlist:", error);
         res.status(500).send("Internal Server Error");
     }
-}
+};
 
 const addToWishlist=async(req,res)=>{
     try {

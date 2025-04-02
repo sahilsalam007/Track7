@@ -4,21 +4,27 @@
 
 </head>
 <style>
-   .error-message{
+       .error-message{
        color: red;
-   }
-
-
+       }
        .thumbnails-container {
            display: flex;
            overflow-x: auto;
        }
-
-
+       .btn-sm {
+       background-color: black !important;
+       color: white !important;
+       border-color: null !important;
+       }
+       .btn-md {
+       background-color: rgb(242, 46, 46) !important;
+       color: white !important;
+       width: 50%;
+       margin-bottom: 10px;
+       margin-left: 20px;
+       }
        .thumbnail {
-           margin-right: 10px;
-
-
+       margin-right: 10px; 
        }
 </style>
    <section class="content-main">
@@ -133,7 +139,7 @@
                                                                <div class="image-cropper d-flex align-items-center"
                                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
                                                                    <img src="" id="croppedImg1" alt="">
-                                                                   <button type="button" id="saveButton1" class="btn-sm btn-primary">Save</button>
+                                                                   <button type="button" id="saveButton1" class="btn-sm">Save</button>
                                                                </div>
                                                            </div>
                                                           
@@ -149,7 +155,7 @@
                                                                <div class="image-cropper d-flex align-items-center"
                                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
                                                                    <img src="" id="croppedImg2" alt="">
-                                                                   <button type="button" id="saveButton2" class="btn-sm btn-primary">Save</button>
+                                                                   <button type="button" id="saveButton2" class="btn-sm">Save</button>
                                                                </div>
                                                            </div>
                                                           
@@ -165,7 +171,7 @@
                                                                <div class="image-cropper d-flex align-items-center"
                                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
                                                                    <img src="" id="croppedImg3" alt="">
-                                                                   <button type="button" id="saveButton3" class="btn-sm btn-primary">Save</button>
+                                                                   <button type="button" id="saveButton3" class="btn-sm">Save</button>
                                                                </div>
                                                            </div>
                                                           
@@ -182,15 +188,14 @@
                                                                <div class="image-cropper d-flex align-items-center"
                                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
                                                                    <img src="" id="croppedImg4" alt="">
-                                                                   <button type="button" id="saveButton4" class="btn-sm btn-primary">Save</button>
+                                                                   <button type="button" id="saveButton4" class="btn-sm">Save</button>
                                                                </div>
                                                            </div>
                           
                                                        </div>
                            </div>
                            <div>
-                               <button class="btn btn-md rounded font-sm hover-up"  type="button" onclick="validateAndSubmit()
-">Publish</button>
+                               <button class="btn btn-md rounded font-sm hover-up"  type="button" onclick="validateAndSubmit()">Publish</button>
                            </div>
                        </form>
                    </div>

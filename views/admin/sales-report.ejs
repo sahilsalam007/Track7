@@ -1,0 +1,226 @@
+<%- include("../../views/partials/admin/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sales Report</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .summary-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .filter-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .alert-danger {
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 15px;
+    background: linear-gradient(135deg, #f43726, #a70909);
+    border: 1px solid white;
+    color:white;
+    transition: all 0.3s ease-in-out;
+}
+
+.alert-danger ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.alert-danger li {
+    padding: 5px 0;
+}
+
+.alert-danger:hover {
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="text-center mb-5 fw-bold text-black">
+            <i class="fas fa-chart-line me-2"></i>Sales Analytics Dashboard
+        </h2>
+        
+
+
+        <% if (typeof errors !== "undefined" && errors.length > 0) { %>
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    <% errors.forEach(error => { %>
+                        <li><%= error %></li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% } %>
+        
+        <!-- Filter Section -->
+<!-- Filter Section -->
+<div class="filter-card shadow-sm">
+    <form action="/admin/sales-report" method="GET">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-secondary">Filter Type</label>
+                <select name="day" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Time</option>
+                    <option value="salesToday" <%= day === "salesToday" ? "selected" : "" %>>Today</option>
+                    <option value="salesWeekly" <%= day === "salesWeekly" ? "selected" : "" %>>This Week</option>
+                    <option value="salesMonthly" <%= day === "salesMonthly" ? "selected" : "" %>>This Month</option>
+                    <option value="salesYearly" <%= day === "salesYearly" ? "selected" : "" %>>This Year</option>
+                </select>
+            </div>
+
+            <!-- Start Date -->
+            <div class="col-md-3">
+                <label class="form-label text-secondary">Start Date</label>
+                <input type="date" name="startDate" value="<%= startDate || '' %>" class="form-control">
+            </div>
+
+            <!-- End Date -->
+            <div class="col-md-3">
+                <label class="form-label text-secondary">End Date</label>
+                <input type="date" name="endDate" value="<%= endDate || '' %>" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Apply
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+        <!-- Sales Summary Cards -->
+        <div class="row g-4 mb-5">
+            <!-- Total Orders -->
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card bg-white p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Orders</p>
+                            <h3 class="mb-0 text-primary"><%= totalOrders.toLocaleString() %></h3>
+                        </div>
+                        <i class="fas fa-shopping-bag fa-3x text-primary opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Sales -->
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card bg-white p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Sales</p>
+                            <h3 class="mb-0 text-success">₹<%= totalSales.toLocaleString('en-IN') %></h3>
+                        </div>
+                        <i class="fas fa-rupee-sign fa-3x text-success opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Net Sales -->
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card bg-white p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Net Sales</p>
+                            <h3 class="mb-0 text-info">₹<%= (totalSales - totalDiscounts).toLocaleString('en-IN') %></h3>
+                        </div>
+                        <i class="fas fa-chart-bar fa-3x text-info opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Order Value -->
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card bg-white p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Avg. Order Value</p>
+                            <h3 class="mb-0 text-warning">₹<%= (totalOrders > 0 ? (totalSales / totalOrders).toLocaleString('en-IN', {maximumFractionDigits: 2}) : 0) %></h3>
+                        </div>
+                        <i class="fas fa-calculator fa-3x text-warning opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="mt-5 text-center">
+            <h5 class="text-secondary mb-4">Export Reports</h5>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/admin/download-excel?day=<%= day %>&startDate=<%= startDate %>&endDate=<%= endDate %>" 
+                   class="btn btn-lg btn-success px-4">
+                    <i class="fas fa-file-excel me-2"></i>Excel
+                </a>
+                <a href="/admin/download-pdf?day=<%= day %>&startDate=<%= startDate %>&endDate=<%= endDate %>" 
+                   class="btn btn-lg btn-danger px-4">
+                    <i class="fas fa-file-pdf me-2"></i>PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const startDateInput = document.querySelector('input[name="startDate"]');
+        const endDateInput = document.querySelector('input[name="endDate"]');
+        const filterSelect = document.querySelector('select[name="day"]');
+
+        form.addEventListener("submit", function (event) {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            const today = new Date();
+
+            if ((startDateInput.value && !endDateInput.value) || (!startDateInput.value && endDateInput.value)) {
+                alert("Please select both Start Date and End Date.");
+                event.preventDefault();
+                return;
+            }
+
+            if (startDateInput.value && endDateInput.value && startDate > endDate) {
+                alert("Start Date cannot be later than End Date.");
+                event.preventDefault();
+                return;
+            }
+
+            if (startDate > today || endDate > today) {
+                alert("Future dates are not allowed.");
+                event.preventDefault();
+                return;
+            }
+
+            if (filterSelect.value !== "") {
+                startDateInput.value = "";
+                endDateInput.value = "";
+            }
+        });
+    });
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

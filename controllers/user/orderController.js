@@ -16,7 +16,7 @@ const orderPlaced = async (req, res) => {
         console.log("User in request:", req.user);
         console.log("Session user:", req.session.user);
 
-        const { totalPrice, addressId, paymentMethod, discount = 99 } = req.body;
+        const { totalPrice, addressId, paymentMethod, discount = 0 } = req.body;
         const userId = req.user._id;
 
         const findUser = await User.findById(userId);
@@ -73,8 +73,7 @@ const orderPlaced = async (req, res) => {
             orderedItems: cart.map(item => ({
                 product: item.productId,
                 quantity: item.quantity,
-                price: item.productId.salesPrice, 
-                size: item.size
+                price: item.productId.salesPrice
             })),
             totalPrice,
             discount,
@@ -140,7 +139,7 @@ const createRazorpayOrder = async (req, res) => {
         }
 
         const address = userAddress.address[0];
-        const discount = 99;
+        const discount = 0;
         const finalAmount = totalPrice - discount;
         const newOrder = new Order({
             userId,
@@ -168,7 +167,7 @@ const createRazorpayOrder = async (req, res) => {
         await newOrder.save();
         await User.updateOne({ _id: userId }, { $set: { cart: [] } });
 
-        // Create Razorpay order
+        // Creating Razorpay order
         const razorpayOrder = await razorpay.orders.create({
             amount: finalAmount * 100,
             currency: "INR",
@@ -264,6 +263,7 @@ const viewOrders = async (req, res) => {
         const skip = (page-1) * limit;
         
         const totalOrder=await Order.countDocuments({userId:userId})
+        
         const totalPages = Math.ceil(totalOrder/limit)
         const orders=await Order.find({userId:userId})
         .populate('userId')
@@ -309,7 +309,6 @@ const cancelOrder = async (req, res) => {
 
         console.log("Cancelling item:", cancelledItem);
 
-        // Refund Logic
         if (findOrder.payment.method === 'razorpay' || findOrder.payment.method === 'wallet') {
             let wallet = await Wallet.findOne({ userId });
             if (!wallet) wallet = new Wallet({ userId, balance: 0, transactions: [] });
@@ -328,7 +327,6 @@ const cancelOrder = async (req, res) => {
             await wallet.save();
         }
 
-        // Restore product stock
         const product = await Product.findById(cancelledItem.product);
         if (product) {
             product.quantity += cancelledItem.quantity;
