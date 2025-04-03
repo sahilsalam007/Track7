@@ -93,6 +93,11 @@ router.get('/orders',userAuth,session,orderController.viewOrders)
 router.post('/cancel-order',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 
+//retry payment
+router.get("/order-failed",userAuth,orderController.loadOrderFailed);
+router.post("/create-failed-order",userAuth,orderController.createFailedOrder);
+router.get("/failed-orders",userAuth,orderController.getFailedOrders);
+
 
 //wishList management
 router.get("/wishlist",userAuth,wishlistController.getWishlist);

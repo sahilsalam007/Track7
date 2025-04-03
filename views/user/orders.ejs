@@ -169,6 +169,7 @@
                                 <h4><%= item.product.productName %></h4>
                                 <p>Price: ₹<%= item.price %></p>
                                 <p>Quantity: <%= item.quantity %></p>
+                                <p>payment status: <%= order.payment.status %></p>
                                 <% if (item.size) { %><p>Size: <%= item.size %></p><% } %>
                                 
                                     <% if (order.status !== 'Delivered' && item.productStatus !=='Cancelled') { %>

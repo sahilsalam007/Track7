@@ -75,7 +75,7 @@ const orderSchema=new Schema({
         },
         status: {
             type: String,
-            enum: ["Pending", "paid", "failed", "refunded", "processing", "Processing"], // Added "Processing"
+            enum: ["Pending", "Paid", "Failed", "refunded", "processing", "Processing"], 
             default: "Pending"
         },
         razorpayDetails: {
@@ -86,7 +86,7 @@ const orderSchema=new Schema({
     },
     status: {
         type: String,
-        enum: ["Pending", "confirmed", "processing", "shipped", "Delivered", "cancelled", "return-requested", "returned", "Processing","Paid","completed"], // Added "Processing"
+        enum: ["Pending", "confirmed", "processing", "shipped", "Delivered", "cancelled", "return-requested", "returned","Failed"],
         default: "pending"
     },
 })

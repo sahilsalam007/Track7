@@ -51,6 +51,8 @@ router.get("/deleteBrand",adminAuth,brandController.deleteBrand);
 router.get("/addProducts",isSessionAdmin,adminAuth,productController.getProductAddPage);
 router.post("/addProducts",adminAuth,uploads.array("images",4),productController.addProducts);
 router.get("/products",isSessionAdmin,adminAuth,productController.getAllProducts);
+router.post("/addProductOffer",isSessionAdmin,adminAuth,productController.addProductOffer);
+router.post("/removeProductOffer",adminAuth,productController.removeProductOffer);
 router.get("/blockProduct",adminAuth,productController.blockProduct);
 router.get("/unblockProduct",adminAuth,productController.unblockProduct);
 router.get("/editProduct",adminAuth,productController.getEditProduct);
@@ -78,6 +80,9 @@ router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
 
 //sales report management
 router.get("/sales-report",isSessionAdmin,adminAuth,salesController.getSalesReport);
+//pdf
+router.get("/download-pdf",isSessionAdmin,adminAuth,salesController.downloadPDF);
+router.get("/download-excel",isSessionAdmin,adminAuth,salesController.downloadExcel);
 
 
 

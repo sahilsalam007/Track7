@@ -124,6 +124,55 @@ const getAllProducts=async (req,res)=>{
     }
 };
 
+const addProductOffer=async(req,res)=>{
+    try {
+        const {productId,percentage}=req.body;
+        if(!percentage || percentage<=0 || percentage>100){
+            return res.json({status:false,message:"Invalid Offer Percentage"});
+        }
+        const findProduct=await Product.findOne({_id:productId})
+        if(!findProduct){
+            return res.json({status:false,message:"Product not found"});
+        }
+        const findCategory=await Category.findOne({_id:findProduct.category})
+        if(!findCategory){
+            return res.json({status:false,message:"Category not found"});
+        }
+        if(findCategory.categoryOffer > percentage){
+            return res.json({status:false,message:"this product category already has a offer"})
+        }
+        findProduct.productOffer=parseInt(percentage)
+        await findProduct.save()
+
+        findCategory.categoryOffer=0
+        await findCategory.save();
+        res.json({status:true,message:"Offer added successfully"});
+    } catch (error) {
+        res.redirect("/pageerror");
+        res.status(500).json({status:false,message:"Internal server error"})
+    }
+}
+
+const removeProductOffer=async(req,res)=>{
+    try {
+        const {productId}=req.body;
+        const finalProduct=await Product.findOne({_id:productId});
+        if(!finalProduct){
+            return res.json({success:false,message:"Product not found"});
+        }
+        const percentage=finalProduct.productOffer
+        if(percentage=== 0){
+            return res.json({success:false,message:"No Offer to remove"});
+        }
+        finalProduct.productOffer=0;
+        await finalProduct.save();
+        res.json({success:true,message:"product offer removed successfully"});
+
+    } catch (error) {
+        res.status(500).json({success:false,message:"Internal server error"});
+        res.redirect(error)
+    }
+}
 
 const blockProduct=async (req,res)=>{
     try{
@@ -236,6 +285,8 @@ module.exports={
     getProductAddPage,
     addProducts,
     getAllProducts,
+    addProductOffer,
+    removeProductOffer,
     blockProduct,
     unblockProduct,
     getEditProduct,

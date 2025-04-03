@@ -59,23 +59,28 @@ const addCategoryOffer=async (req,res)=>{
 try {
     const percentage=parseInt(req.body.percentage);
     const categoryId=req.body.categoryId;
+
     const category=await Category.findById(categoryId);
     if(!category){
         return res.status(404).json({status:false,message:"Category not found"})
     }
-    const products=await Product.find({category:category._id});
+
+    const products=await Product.find({category:categoryId});
     const hasProductOffer=products.some((product)=>product.productOffer>percentage);
     if(hasProductOffer){
         return res.json({status:false , message:"Products with in this category already have product offers"})
     }
+
+    category.categoryOffer=percentage;
+    await category.save();
     await Category.updateOne({_id:categoryId},{$set:{categoryOffer:percentage}})
 
     for(const product of products){
-        product.productOffer=0;
-        product.salesPrice=product.regularPrice;
+        product.productOffer=percentage;
+        product.salesPrice=Math.floor(product.regularPrice*(1-percentage/100))
         await product.save();
     }
-    res.json({status:true});
+    res.json({status:true,message:"Category Offer added successfully"});
 } 
 catch (error) {
     res.status(500).json({status:false , message:"Internal Server Error"})
@@ -96,7 +101,7 @@ const removeCategoryOffer=async (req,res)=>{
 
         if(products.length > 0){
             for(const product of products){
-                product.salePrice += Math.floor(product.regularPrice * (percentage/100));
+                product.salesPrice += Math.floor(product.regularPrice * (percentage/100));
                 product.productOffer=0;
                 await product.save();
             }

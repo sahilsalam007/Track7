@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Failed Orders - Retry Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, #f43726, #b8880f);
+            color: white;
+            padding: 2rem;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 2rem;
+        }
+
+        .order-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            margin: 1rem;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-img {
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4757;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #71d425, #12ac07);
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-retry:hover {
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .order-details {
+            border-left: 2px solid #eee;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .order-details {
+                border-left: none;
+                padding-left: 0;
+                padding-top: 1rem;
+            }
+        }
+        .back-to-home {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-to-home a {
+    display: inline-block;
+    background-color: linear-gradient(135deg, #f43726, #b8880f); /* Red background for attention */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    border-color: #b8880f;
+    border: solid;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.back-to-home a:hover {
+    background-color: #cc0000; /* Darker red on hover */
+}
+
+    </style>
+</head>
+<body>
+    <div class="header-gradient">
+        <div class="container">
+            <h2 class="mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Failed Payments</h2>
+            <p class="lead mb-0">Review and retry your failed payment attempts</p>
+        </div>
+        <div class="back-to-home"><a href="/">Back to home</a></div>
+    </div>
+
+    <div class="container">
+        <div id="failedOrders" class="row g-4">
+            <%failedOrders.forEach(order =>{%>
+            <div class="col-12">
+                <div class="order-card card">
+                    <div class="card-body">
+                        <span class="status-badge">Payment <%=order.status%></span>
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <img src="/uploads/re-image/<%= order.orderedItems[0].product.productImage[0] %>" 
+                                     alt="Running Shoes" 
+                                     class="product-img w-80">
+                            </div>
+                            <div class="col-md-6 order-details">
+                                <h5 class="card-title mb-3">Order #<%=order.orderId%></h5>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <p class="mb-1"><i class="fas fa-tag me-2 text-muted"></i> <%= order.orderedItems[0].product.productName %></p>
+                                        <p class="mb-1"><i class="fas fa-calendar me-2 text-muted"></i><%= order.createdOn.toDateString() %></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1"><i class="fas fa-wallet me-2 text-muted"></i><%= order.paymentMethod %></p>
+                                        <!-- <p class="mb-1"><i class="fas fa-repeat me-2 text-muted"></i>2 attempts</p> -->
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-danger me-2"><i class="fas fa-exclamation-circle"></i></span>
+                                    <small class="text-danger">Last attempt failed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center mt-3 mt-md-0">
+                                <h4 class="text-danger mb-3">₹<%= order.finalAmount %></h4>
+                                <button class="btn btn-retry w-100" onclick="retryPayment('<%= order._id %>','<%= order.totalPrice %>', '<%= order.discount %>', '<%=order.userId._id%>')">
+                                    <i class="fas fa-redo-alt me-2"></i>Pay again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%})%>
+    </div>
+
+    <script>
+         async function retryPayment(orderId, totalPrice, discount,user) {
+            console.log('from retry',orderId,totalPrice,discount,user)
+    try {
+        const response = await fetch("/create-razorpay-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: totalPrice, currency: "INR" }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            openRazorpayCheckout(data.order, totalPrice, discount,orderId,user);
+        } else {
+            Swal.fire("Error", "Failed to create Razorpay order for retry", "error");
+        }
+    } catch (error) {
+        console.error("Error creating Razorpay retry order:", error);
+    }
+}
+
+
+
+
+function openRazorpayCheckout(order, amount, discount,orderId,user) {
+    console.log("Opening Razorpay for retry...");
+
+    const userId = user;
+   // const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked')?.value;
+
+    var options = {
+        key: "<%=RAZORPAY_KEY_ID%>",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Vanguard Footwear",
+        description: "Retry Order Payment",
+        order_id: order.id,
+        handler: async function (response) {
+            console.log("Retry Payment Success:", response);
+
+            const paymentData = {
+                userId: userId,
+               // addressId: selectedAddress,
+                totalPrice: amount,
+                discount: discount,
+                orderId:orderId,
+                paymentMethod: "razorpay",
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature,
+            }
+
+            try {
+                const res = await fetch("/verify-razorpay-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentData),
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Payment Successful!",
+                        text: "Your order has been placed successfully.",
+                    }).then(() => {
+                        window.location.href = "/order-success";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Payment Failed",
+                        text: "There was an issue with the payment.",
+                    }).then(() => {
+                        window.location.href = "/order-failed";
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Order Error",
+                    text: "Something went wrong while processing your payment.",
+                }).then(() => {
+                    window.location.href = "/order-failed";
+                });
+            }
+        },
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+    </script>
+</body>
+</html>

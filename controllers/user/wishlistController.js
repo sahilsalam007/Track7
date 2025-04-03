@@ -11,9 +11,10 @@ const getWishlist = async (req, res) => {
             });
 
         const wishlistProducts = wishlist && wishlist.products ? wishlist.products : [];
-
+        let user = await User.findOne({ _id:userId })
         res.render("wishlist", {
             wishlist: wishlistProducts,
+            user:user
         });
     } catch (error) {
         console.error("Error fetching wishlist:", error);
