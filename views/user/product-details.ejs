@@ -64,7 +64,7 @@
         .product-info p {
             color: #555; /* Dark grey text for description */
         }
-
+        
         .price {
             font-size: 20px;
             font-weight: bold;
@@ -204,7 +204,15 @@
                     <button class="btn" disabled>Out of Stock</button>
                   <% } %>
                   
-                <!-- <button class="btn">Wishlist</button> -->
+                  <button class="btn wishlist-btn" data-id="<%= product._id %>">
+                    <% if (wishlistItems && wishlistItems.includes(product._id.toString())) { %>
+                      <i class="fa-solid fa-heart" style="color: red;"></i> Wishlist
+                    <% } else { %>
+                      <i class="fa-regular fa-heart" style="color: black;"></i> Wishlist
+                    <% } %>
+                  </button>
+                  
+                  
 
                 <p class="rating">⭐⭐⭐⭐☆ (4.5 / 5)</p>
 
@@ -298,3 +306,49 @@
     });
 });
     </script>
+      <script>
+    $(document).ready(function () {
+        $(".wishlist-btn").on("click", function (event) {
+            event.stopPropagation();
+            const heartIcon = $(this).find("i");
+            const productId = $(this).attr("data-id");
+            const isAdding = heartIcon.hasClass("fa-regular");
+
+            $.ajax({
+                url: isAdding ? "/wishlist/add" : "/wishlist/remove",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ productId }),
+                success: function (response) {
+                    if (response.success) {
+                        heartIcon.toggleClass("fa-regular fa-solid");
+                        heartIcon.css("color", isAdding ? "red" : "black");
+
+                        // Show SweetAlert2 popup for Wishlist action
+                        Swal.fire({
+                            icon: "success",
+                            title: isAdding ? "Added to Wishlist" : "Removed from Wishlist",
+                            text: isAdding ? "Product has been added to your wishlist!" : "Product has been removed from your wishlist.",
+                            confirmButtonText: "OK"
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: response.message,
+                            confirmButtonText: "OK"
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong! Please try again.",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
+        });
+    });
+</script>

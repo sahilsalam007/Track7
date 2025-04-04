@@ -116,6 +116,7 @@
         .add-to-cart:hover {
             background: var(--accent-color);
         }
+        
 
         .remove-btn {
             background: #ff4444;
@@ -163,9 +164,19 @@
                                 <span class="original-price">₹<%= item.productId.regularPrice %></span>
                             </div>
                             <div class="action-buttons">
-                                <a class="btn add-to-cart" href="/productDetails?id=<%=item.productId._id%>">
-                                    <i class="fas fa-cart-plus"></i> Add to Cart
-                                </a>
+                                <% if (!item.productId.isBlocked) { %>
+                                    <button class="btn add-cart" 
+                                        data-id="<%= item.productId._id %>" 
+                                        data-quantity="1" 
+                                        data-price="<%= item.productId.salePrice %>">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-secondary" disabled>
+                                        <i class="fas fa-ban"></i> Not Available
+                                    </button>
+                                <% } %>
+                                
                                 <button class="btn remove-btn" onclick="removeFromWishlist('<%= item.productId._id %>')">
                                     <i class="fas fa-trash"></i> Remove
                                 </button>
@@ -213,6 +224,54 @@
             });
         }
     </script>
+
+<script>
+    document.querySelectorAll('.add-cart').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const productId = this.getAttribute('data-id');
+            const quantity = parseInt(this.getAttribute('data-quantity')) || 1;
+    
+            $.ajax({
+                url: `/addToCart/${productId}`,
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({ quantity: quantity }),
+                contentType: 'application/json',
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart',
+                        text: response.message,
+                    }).then(() => {
+                        return Swal.fire({
+                            title: 'Go to cart?',
+                            showCancelButton: true,
+                            confirmButtonText: "YES",
+                            cancelButtonText: "NO",
+                        });
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/cart';
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || 'Error while adding to cart';
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: errorMessage,
+                    });
+                    console.error('Error details:', xhr.responseJSON);
+                }
+            });
+        });
+    });
+    </script>
+    
     
 
 <%- include("../../views/partials/user/footer") %> 

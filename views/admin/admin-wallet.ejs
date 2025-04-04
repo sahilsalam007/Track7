@@ -1,4 +1,4 @@
-<%- include("../../views/partials/admin/header") %>
+<!-- <%- include("../../views/partials/admin/header") %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     
         <div class="card mb-4">
             <div class="card-body">
-                <div class="row">
+                <div class="row"> -->
                     <!-- Wallet Summary Cards -->
                     <!-- <div class="col-md-4 mb-4">
                         <div class="card bg-primary text-white shadow-lg">
@@ -104,7 +104,7 @@
                         </div>
                     </div> -->
     
-                    <div class="col-md-4 mb-4">
+                    <!-- <div class="col-md-4 mb-4">
                         <div class="card bg-success text-white shadow-lg">
                             <div class="card-body">
                                 <h5 class="card-title">Total Credits</h5>
@@ -127,10 +127,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
     
                 <!-- Transaction History Table -->
-                <div class="table-responsive">
+                <!-- <div class="table-responsive">
                     <table class="table table-hover align-middle" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
                         <thead class="table-dark" style="font-size: 0.95rem;">
                             <tr>
@@ -144,9 +144,9 @@
                         </thead>
                         <tbody style="font-size: 0.9rem;">
                             <% transactions.forEach(txn => { %>
-                                <tr style="vertical-align: middle; height: 60px;">
+                                <tr style="vertical-align: middle; height: 60px;"> -->
                                     
-                                    <td style="font-weight: 500; color: #4a4a4a;">
+                                    <!-- <td style="font-weight: 500; color: #4a4a4a;">
                                         <%= new Date(txn.transactions.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
                                     </td>
      
@@ -201,19 +201,19 @@
                  <nav class="mt-4">
                     <ul class="pagination justify-content-center">
                         <!-- Previous Button -->
-                        <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+                        <!-- <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
                             <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-                        </li>
+                        </li> -->
                 
                         <!-- Page Numbers -->
-                        <% for(let i = 1; i <= totalPages; i++) { %>
+                        <!-- <% for(let i = 1; i <= totalPages; i++) { %>
                             <li class="page-item <%= currentPage === i ? 'active' : '' %>">
                                 <a class="page-link" href="?page=<%= i %>"><%= i %></a>
                             </li>
-                        <% } %>
+                        <% } %> -->
                 
                         <!-- Next Button -->
-                        <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+                        <!-- <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
                             <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
                         </li>
                     </ul>
@@ -226,5 +226,5 @@
        
     </script>
 </body>
-</html>
-<%- include("../../views/partials/admin/footer") %>
+</html> --> -->
+<!-- <%- include("../../views/partials/admin/footer") %> -->

@@ -75,8 +75,8 @@ router.post("/updateCoupon",adminAuth,couponController.updateCoupon);
 router.get("/deleteCoupon",adminAuth,couponController.deleteCoupon);
 
 // wallet management
-router.get("/wallet",adminAuth,walletController.getWallet);
-router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
+// router.get("/wallet",adminAuth,walletController.getWallet);
+// router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
 
 //sales report management
 router.get("/sales-report",isSessionAdmin,adminAuth,salesController.getSalesReport);

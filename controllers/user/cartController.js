@@ -70,7 +70,12 @@ const addToCart = async (req, res) => {
                 message: "Product not found"
             });
         }    
-
+        if(product.isBlocked){
+            return res.status(403).json({
+                status:"error",
+                message:"This product is no longer available"
+            })
+        }
         if (product.quantity <= 0) {
             return res.status(400).json({
                 status: "error",

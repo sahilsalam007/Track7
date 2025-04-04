@@ -87,10 +87,10 @@
                                <div class="col-lg-4">
                                    <div class="mb-4">
                                        <label class="form-label">Sale price</label>
-                                       <input name="salePrice" type="text" value="<%=product.salePrice%>"
+                                       <input name="salesPrice" type="text" value="<%=product.salesPrice%>"
                                            class="form-control border">
                                    </div>
-                                   <div id="salePrice-error" class="error-message"></div>
+                                   <div id="salesPrice-error" class="error-message"></div>
                                </div>
                                <div class="col-lg-4">
                                    <div class="mb-4">
@@ -248,7 +248,7 @@
                const description = document.getElementsByName('description')[0].value;
                const brand = document.getElementsByName('brand')[0].value;
                const price = document.getElementsByName('regularPrice')[0].value;
-               const saleprice = document.getElementsByName('salePrice')[0].value;
+               const salesprice = document.getElementsByName('salesPrice')[0].value;
                const color = document.getElementsByName('color')[0].value;
                const category = document.getElementsByName('category')[0].value;
                const images = document.getElementById('input1')
@@ -278,8 +278,8 @@
                    displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
                    isValid = false;
                }
-              if (!/^\d+(\.\d{1,2})?$/.test(saleprice) || parseFloat(saleprice) < 0) {
-                   displayErrorMessage('salePrice-error', 'Please enter a valid non-negative price.');
+              if (!/^\d+(\.\d{1,2})?$/.test(salesprice) || parseFloat(salesprice) < 0) {
+                   displayErrorMessage('salesPrice-error', 'Please enter a valid non-negative price.');
                    isValid = false;
                }
               

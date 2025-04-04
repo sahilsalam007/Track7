@@ -602,7 +602,7 @@
   <!-- wishlist icon-->
   <script>
     $(document).ready(function () {
-        $(".wishlist-icon").on("click", function (event) {
+        $(".wishlist-icon, .wislist-btn").on("click", function (event) {
             event.stopPropagation();
             const heartIcon = $(this).find("i");
             const productId = $(this).attr("data-id");
