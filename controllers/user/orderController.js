@@ -63,10 +63,13 @@ const orderPlaced = async (req, res) => {
         }
 
         for (const item of cart) {
-            const product = await Product.findById(item.productId);
-            product.quantity -= item.quantity;
-            await product.save();
+            const product = await Product.findById(item.productId._id); // Make sure you get the correct product
+            if (product) {
+                product.quantity -= item.quantity;
+                await product.save();
+            }
         }
+        
 
         const newOrder = new Order({
             userId,

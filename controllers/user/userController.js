@@ -236,7 +236,7 @@ const loadShoppingPage = async (req, res) => {
     try {
         const userId = req.session.user ? req.session.user._id : null;
         let userData = userId ? await User.findById(userId) : null;
-        
+
         const query = {
             search: req.query.search || '',
             sort: req.query.sort || '',
@@ -246,17 +246,17 @@ const loadShoppingPage = async (req, res) => {
             minPrice: req.query.minPrice || ''
         };
 
-        console.log(query)
+        console.log(query);
 
         const filter = {
             isBlocked: false,
             status: "Available"
         };
-  
+
         if (query.search) {
             filter.productName = { $regex: query.search, $options: 'i' };
         }
-        
+
         if (query.category) {
             filter.category = query.category;
         }
@@ -292,20 +292,37 @@ const loadShoppingPage = async (req, res) => {
             Category.find({ isListed: true }),
             Brand.find()
         ]);
-  
+
+        // ✅ Calculate best offer (product/category) for each product
+        const updatedProducts = products.map(product => {
+            const regularPrice = product.regularPrice;
+            const productOffer = product.productOffer || 0;
+            const categoryOffer = product.category?.categoryOffer || 0;
+
+            const highestOffer = Math.max(productOffer, categoryOffer);
+            const discountAmount = (regularPrice * highestOffer) / 100;
+            const finalSalesPrice = Math.round(regularPrice - discountAmount);
+
+            return {
+                ...product._doc,
+                finalSalesPrice,
+                appliedOffer: highestOffer
+            };
+        });
+
         let wishlistItems = [];
         let cartItems = [];
-  
+
         if (userId) {
             const wishlist = await Wishlist.findOne({ userId }).select("products");
             wishlistItems = wishlist ? wishlist.products.map(item => item.productId.toString()) : [];
-  
+
             const cart = await Cart.findOne({ userId }).select("items.productId");
             cartItems = cart ? cart.items.map(item => item.productId.toString()) : [];
         }
 
         res.render("shop", {
-            products,
+            products: updatedProducts,
             categories,
             brands,
             query,
@@ -314,12 +331,13 @@ const loadShoppingPage = async (req, res) => {
             wishlistItems,
             cartItems 
         });
-  
+
     } catch (error) {
         console.error("Shop page error:", error);
         res.render("login");
     }
 };
+
 
 
 module.exports={

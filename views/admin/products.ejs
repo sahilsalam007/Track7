@@ -72,24 +72,28 @@
                 <td><%=data[i].brand%></td>
                 <td><%=data[i].category.name%></td>
                 <td><%=data[i].salesPrice%></td>
-                <td>
-                    <%if(locals.data[i].productOffer){%>
-                        <%=data[i].productOffer%>
-                        <%}else{%>
-                            0%
-                        <%}%>
+                <td id="offer-<%= data[i]._id %>">
+                    <% if (data[i].productOffer > 0) { %>
+                        <%= data[i].productOffer %>% (Product Offer)
+                    <% } else if (data[i].category.categoryOffer > 0) { %>
+                        <%= data[i].category.categoryOffer %>% (Category Offer)
+                    <% } else { %>
+                        0%
+                    <% } %>
                 </td>
-                <td>
-                    <%if(locals.data[i].productOffer===0){%>
-                    <button class="btn btn-info"  onclick="addOffer('<%=data[i]._id%>')" style="width: 100px;">
-                        Add Offer
-                    </button>
-                    <%}else{%>
-                    <button class="btn btn-info" onclick="removeOffer('<%=data[i]._id%>')" style="width: 100px;">
-                       Remove
-                    </button>
-                    <%}%>
+                
+                <td id="offer-btn-<%= data[i]._id %>">
+                    <% if (data[i].productOffer === 0) { %>
+                        <button class="btn btn-info" onclick="addOffer('<%= data[i]._id %>', <%= data[i].category.categoryOffer %>)" style="width: 100px;">
+                            Add Offer
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-info" onclick="removeOffer('<%= data[i]._id %>')" style="width: 100px;">
+                            Remove
+                        </button>
+                    <% } %>
                 </td>
+                
                 <td><%=data[i].quantity%></td>
                 <td>
                     <%if(data[i].isBlocked===false) {%>
@@ -134,10 +138,11 @@
         title:"Offer in percentage",
         input:"number",
         inputLabel:"Percentage",
-        inputPlaceholder:"%",
-        inputAttributes:{min:1,max:100}
+        inputPlaceholder:"Enter % (1-100)",
+        inputAttributes:{min:1,max:100},
+        showCancelButton:true
       });
-      if(!amount || amount<=0 || amount>100){
+      if(!amount || isNaN(amount) || amount<=0 || amount>100){
         return Swal.fire("Invalid Input","Please eneter a valid percentage (1-100)","error");
       }
       $.ajax({
@@ -149,7 +154,7 @@
                 Swal.fire("Offer Added","The discount has been successfully applied","success")
                 .then(()=>location.reload());
             }else{
-                Swal.fire("Failed",Response.message || "Something went wrong","error");
+                Swal.fire("Failed",response.message || "Something went wrong","error");
             }
         }
       });
@@ -165,22 +170,27 @@
                 confirmButtonColor:"#d33",
                 cancelButtonColor:"#3085d6",
                 confirmButtonText:"Yes, remove it",
-                timer:5000,
-                timerProgressBar:true,
-            }).then((result)=>{
+                }).then((result)=>{
                 if(result.isConfirmed){
                     $.ajax({
                         url:"/admin/removeProductOffer",
                         method:"POST",
                         data:{productId:productId},
-                        success:(response)=>{
-                            if(response.status===true){
-                              Swal.fire("Removed","The Offer has been removed","success")
-                              .then(()=>location.reload());
-                            }else{
-                                Swal.fire("Failed",response.message || "Something went wrong","error")
-                            }
-                        },
+                        success: (response) => {
+                 if (response.success === true) {
+                     Swal.fire("Removed", "The Offer has been removed", "success").then(() => {
+                         document.getElementById(`offer-${productId}`).innerText = "0%";
+                         document.getElementById(`offer-btn-${productId}`).innerHTML = `
+                             <button class="btn btn-info" onclick="addOffer('${productId}', 0)" style="width: 100px;">
+                                 Add Offer
+                             </button>
+                         `;
+                     });
+                 } else {
+                     Swal.fire("Failed", response.message || "Something went wrong", "error");
+    }
+}
+,
                         error:(xhr,status,error)=>{
                             console.error("AJAX Error:",error);
                             Swal.fire("Error","An unexpected error occurred","error")
