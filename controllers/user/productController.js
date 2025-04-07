@@ -20,7 +20,6 @@ const productDetails = async (req, res) => {
       _id: { $ne: productId },
     }).limit(3);
 
-    // Get wishlist
     let wishlistItems = [];
     if (userId) {
       const wishlist = await Wishlist.findOne({ userId });

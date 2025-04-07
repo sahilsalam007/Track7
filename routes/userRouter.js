@@ -92,6 +92,7 @@ router.get('/order-success',userAuth,orderController.loadOrderSuccess)
 router.get('/orders',userAuth,session,orderController.viewOrders)
 router.post('/cancel-order',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
+router.get('/download-invoice/:orderId',userAuth,orderController.downloadInvoice)
 
 //retry payment
 router.get("/order-failed",userAuth,orderController.loadOrderFailed);

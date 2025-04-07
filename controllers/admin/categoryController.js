@@ -88,7 +88,6 @@ const addCategoryOffer = async (req, res) => {
 };
 
 
-
 const removeCategoryOffer=async (req,res)=>{
     try {
         const categoryId=req.body.categoryId;

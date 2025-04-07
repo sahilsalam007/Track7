@@ -228,7 +228,7 @@
                 <p class="text-muted mb-0" style="font-weight: 500;">Order ID: <%= order.orderId %></p>
             </div>
             <div class="d-flex justify-content-end align-items-center mt-3 mt-md-0 w-100">
-                <% if (order.status.toLowerCase() === "delivered" || order.status.toLowerCase() === "confirmed") { %>
+                <% if (order.status.toLowerCase() === "delivered" || order.status.toLowerCase() === "confirmed" ||order.payment.status==='Paid') { %>
                     <a href="/download-invoice/<%= order._id %>" class="btn btn-download-invoice">
                         <i class="fas fa-download me-2"></i>  Download Invoice
                     </a>

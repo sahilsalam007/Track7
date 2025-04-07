@@ -286,7 +286,7 @@
                                     <span>
                                         <strong><%= coupon.name %></strong> - ₹<%= coupon.offerPrice %> OFF
                                     </span>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="applySelectedCoupon('<%= coupon.name %>','<%= coupon.offerPrice %>' )">Apply</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="applyCoupon('<%= coupon.name %>','<%= coupon.offerPrice %>','<%= coupon.minimumPrice %>','<%= totalPrice %>' )">Apply</button>
                                 </li>
                             <% }); %>
                         <% } else { %>
@@ -294,8 +294,7 @@
                         <% } %>
                     </ul>
                     </div>
-                    
-                    <!-- Coupon Input Section -->
+
                     <div class="coupon-section mb-3">
                         <div id="couponInputGroup" class="d-flex gap-2">
                             <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code">
@@ -363,7 +362,6 @@ async function initiateRazorpayPayment(userId) {
     console.log("Selected Address ID:", addressId);
 
     try {
-        // Step 1: Create a Razorpay order
         const orderResponse = await fetch("/create-razorpay-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -378,10 +376,8 @@ async function initiateRazorpayPayment(userId) {
         if (!orderResult.success) {
             throw new Error(orderResult.error || "Failed to create order");
         }
-
-        // Step 2: Configure Razorpay payment options
         const razorpayOptions = {
-            key: "<%= process.env.RAZORPAY_KEY_ID %>",  // Replace this dynamically from the backend
+            key: "<%= process.env.RAZORPAY_KEY_ID %>",  
             amount: totalPrice * 100,
             currency: "INR",
             name: "Your Store Name",
@@ -437,12 +433,10 @@ async function initiateRazorpayPayment(userId) {
 
         const razorpayPayment = new Razorpay(razorpayOptions);
 
-        // Handle Payment Failure and Call `createFailedOrder`
         razorpayPayment.on("payment.failed", async function (response) {
             console.error("Payment Failed:", response);
 
             try {
-                // Step 4: Create Failed Order in Database
                 const failedOrderResponse = await fetch("/create-failed-order", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -491,7 +485,7 @@ async function initiateRazorpayPayment(userId) {
         });
 
         razorpayPayment.open();
-    } catch (error) {   // Missing closing `}` was added here
+    } catch (error) {  
         Swal.fire({
             icon: "error",
             title: "Payment Error",
@@ -536,7 +530,7 @@ async function initiateRazorpayPayment(userId) {
                         userId: userId,
                         addressId: addressId,
                         totalPrice: totalPrice,
-                        paymentMethod: "COD" // Explicitly specify COD
+                        paymentMethod: "COD"
                     })
                 });
     
@@ -558,8 +552,8 @@ async function initiateRazorpayPayment(userId) {
                  headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({
                      userId: userId,
-                     addressId: selectedAddress,
-                     amount: totalPrice,
+                     addressId: addressId,
+                     totalPrice,
                      paymentMethod: paymentMethod.value, 
                  })
              });
@@ -651,8 +645,12 @@ async function initiateRazorpayPayment(userId) {
 
     //coupon
     let appliedCouponCode=null;
-    async function applyCoupon(){
-        const couponCode=document.getElementById("couponCode").value.trim();
+    async function applyCoupon(couponName,offerPrice,minimumPrice,totalPrice){
+        const couponCode=couponName
+        if(totalPrice<minimumPrice){
+            showCouponMessage("not valid coupon");
+            return;
+        }
         if(!couponCode){
             showCouponMessage("Please eneter a coupon code","red");
             return;

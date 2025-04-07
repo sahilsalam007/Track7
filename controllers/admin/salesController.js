@@ -10,7 +10,7 @@ const getSalesReport = async (req, res) => {
         const { page = 1, day, startDate, endDate } = req.query;
         const limit = 10;
         const skip = (page - 1) * limit;
-        let query = { status: { $in: ["Confirmed", "Delivered"] } }; 
+        let query = { 'payment.status':'Paid' }; 
         let errors = [];
 
         if (startDate && endDate) {
@@ -89,14 +89,13 @@ const getSalesReport = async (req, res) => {
                 model: 'Product',
                 select: 'name price'
             })
-            .populate('userId', 'firstName email')
+            .populate('userId')
             .skip(skip)
             .limit(limit)
             .sort({ createdOn: -1 })
             .lean();
 
-        const allOrders = await Order.find(query).lean();
-        console.log(allOrders);
+        const allOrders = await Order.find(query).populate('userId').lean();
 
         const salesMetrics = allOrders.reduce((acc, order) => ({
             totalOrders: acc.totalOrders + 1,
@@ -130,10 +129,13 @@ const getSalesReport = async (req, res) => {
 };
 
 
-const downloadPDF = async (req, res) => {
+
+const downloadPDF=async(req, res,next) => {
     try {
+
+
         let { day, startDate, endDate } = req.query;
-        let query = { status: { $in: ["Confirmed", "Delivered"] } };
+        let query = { 'payment.status':'Paid' }; 
 
         const today = new Date();
         let fromDate = null;
@@ -182,97 +184,77 @@ const downloadPDF = async (req, res) => {
             .sort({ createdOn: -1 })
             .lean();
 
-        if (orders.length === 0) {
-            return res.status(404).json({ message: "No orders found for the selected date range" });
-        }
+            console.log(orders);
 
-        let totalSales = 0;
-        let totalDiscounts = 0;
-        let totalOrders = orders.length;
 
-        orders.forEach(order => {
-            totalSales += order.finalAmount || 0;
-            totalDiscounts += order.discount || 0;
-        });
+        const orderDetails=orders.map((order)=>{
+            return {
+                    orderId:order?.orderId,
+                    orderDate:order?.createdOn,
+                    itemsCount:order.orderedItems.length,
+                    usedCoupon:"djlkf",
+                    customer:"sahil",
+                    amount:order?.finalAmount
+                }
+        })
 
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=salesReport.pdf");
+      const doc = new PDFDocument({
+        size: 'A4',
+        margins: { top: 50, left: 40, right: 40, bottom: 50 },
+      });
 
-        const doc = new PDFDocument({ margin: 40, size: "A4" });
-        doc.pipe(res);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="sales-report.pdf"');
 
-        // ✅ **Title**
-        doc.fontSize(18).font("Helvetica-Bold").text("Sales Report", { align: "center" });
-        doc.moveDown(0.5);
-        doc.fontSize(12).font("Helvetica").text(`Date Range: ${startDate} - ${endDate}`, { align: "center" });
-        doc.moveDown(1);
+      doc.pipe(res);
+  
+      doc.fontSize(20).font('Helvetica-Bold').text('Sales Report', { align: 'center' }).moveDown();
+ 
+      doc.fontSize(12).text(`Report Date: ${today}`, { align: 'right' }).moveDown();
+  
+      doc.rect(20, doc.y, 550, 20).fillAndStroke('#000000', '#00000');
+      doc
+      .font('Helvetica-Bold')
+        .fillColor('#ffffff')
+        .fontSize(12)
+        .text('Order ID', 55, doc.y + 5, { width: 200 })
+        .text('order Date', 175, doc.y - 15 , { width: 70 })
+        .text('Items Count', 270, doc.y - 14, { width: 100 })
+        .text('Customer', 400, doc.y - 14, { width: 100 })
+        .text('Amount', 500, doc.y - 14, { width: 100 })
+      doc.moveDown();
 
-        // ✅ **Summary**
-        doc.fontSize(12).font("Helvetica-Bold").text("Summary", { underline: true });
-        doc.moveDown(0.5);
-        doc.fontSize(10).font("Helvetica")
-            .text(`Total Orders: ${totalOrders}`)
-            .text(`Total Sales: ₹${totalSales.toFixed(2)}`)
-            .text(`Total Discount: ₹${totalDiscounts.toFixed(2)}`);
-        doc.moveDown(1);
+      let isAlternate = false;
+      orderDetails.forEach((order) => {
+        const rowColor = isAlternate ? '#f9f9f9' : '#fff';
+        doc.rect(20, doc.y, 550, 30).fillAndStroke(rowColor, '#ddd');
+        doc
+        .font('Helvetica')
+          .fillColor('#000')
+          .fontSize(12)
+          .text(order.orderId.slice(0,15)+'...', 40, doc.y + 9, { width: 200 })
+          .text(order.orderDate.toLocaleDateString(), 185, doc.y - 12 , { width: 70 })
+          .text(order.itemsCount, 300, doc.y - 14, { width: 100 })
+          .text(order.customer, 405, doc.y - 14, { width: 100 })
+          .text(order.amount, 500, doc.y - 14, { width: 100 })
+        doc.moveDown();
+        isAlternate = !isAlternate;
+      });
+  
+      doc.rect(20, doc.y, 550, 90).fillAndStroke("f9f9f9", '#ddd');
 
-        // ✅ **Table Header Formatting**
-        doc.fontSize(12).font("Helvetica-Bold").text("Orders Report");
-        doc.moveDown(0.5);
+      doc
+        .fontSize(10)
+        .fillColor("#0000")
+        .text('Thank you for your business!', 50, doc.y + 15, { align: 'center', baseline: 'bottom' });
 
-        const headers = ["Order ID", "Date", "Customer", "Payment Method", "Total Qty", "Total Amount", "Discount", "Coupon", "Status"];
-        const columnWidths = [100, 70, 80, 90, 60, 90, 70, 70, 60];
-
-        let x = doc.x;
-        let y = doc.y;
-
-        // Draw header row with background
-        doc.rect(x - 5, y - 3, 570, 20).fill("#d3d3d3").stroke();
-        doc.fillColor("black");
-
-        headers.forEach((header, i) => {
-            doc.fontSize(10).font("Helvetica-Bold").text(header, x, y, { width: columnWidths[i], align: "center" });
-            x += columnWidths[i];
-        });
-
-        doc.moveDown(1);
-        y = doc.y;
-
-        // ✅ **Table Rows**
-        orders.forEach(order => {
-            let x = doc.x;
-            let y = doc.y;
-
-            const rowData = [
-                order._id || "Unknown",
-                order.createdOn.toISOString().split("T")[0],
-                order.userId?.firstName || "Unknown",
-                order.paymentMethod || "N/A",
-                order.orderedItems.reduce((sum, item) => sum + (item.quantity || 0), 0), // Total Qty
-                `₹${order.finalAmount ? order.finalAmount.toFixed(2) : "0.00"}`,
-                `₹${order.discount ? order.discount.toFixed(2) : "0.00"}`,
-                order.coupon || "-",
-                order.status || "N/A"
-            ];
-
-            rowData.forEach((text, i) => {
-                doc.fontSize(9).font("Helvetica").text(text, x, y, { width: columnWidths[i], align: "center" });
-                x += columnWidths[i];
-            });
-
-            // Draw row separators
-            doc.moveDown(0.5);
-            doc.rect(doc.x - 5, y - 3, 570, 18).stroke(); 
-
-            doc.moveDown(0.5);
-        });
-
-        doc.end();
+      doc.end();
     } catch (error) {
-        console.error("PDF Generation Error:", error);
-        res.status(500).json({ message: "Error generating PDF report" });
+        console.log(error.message)
+      res.status(500).send('Error generating PDF');
     }
-};
+  };
+
 
 const downloadExcel = async (req, res) => {
     try {
@@ -295,8 +277,9 @@ const downloadExcel = async (req, res) => {
 
         const start = new Date(startDate);
         const end = new Date(endDate);
-        start.setUTCHours(0, 0, 0, 0);
-        end.setUTCHours(23, 59, 59, 999);
+        start.setUTCHours(0 - 5, 30, 0, 0);    
+         end.setUTCHours(23 - 5, 59 + 30, 59, 999); 
+
         query.createdOn = { $gte: start, $lte: end };
 
         const orders = await Order.find(query)
@@ -338,6 +321,8 @@ const downloadExcel = async (req, res) => {
         res.status(500).json({ message: "Error generating Excel report" });
     }
 };
+
+
 module.exports={
     getSalesReport,
     downloadPDF, 

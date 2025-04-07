@@ -7,6 +7,7 @@ const getWallet=async(req,res)=>{
             return res.redirect("/login")
         }
         const wallet=await Wallet.findOne({userId})
+        wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         if(!wallet){
             const newWallet=new Wallet({
                 userId,

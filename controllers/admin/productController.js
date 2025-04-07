@@ -150,7 +150,6 @@ const addProductOffer = async (req, res) => {
             return res.json({ status: false, message: "Invalid regular price" });
         }
 
-        // ✅ Set only the product offer and recalculate sales price
         findProduct.productOffer = offerPercent;
         findProduct.salesPrice = Math.round(regularPrice - (regularPrice * highestOffer / 100));
 
@@ -178,10 +177,8 @@ const removeProductOffer = async (req, res) => {
             return res.json({ success: false, message: "No offer to remove." });
         }
 
-        // ✅ Reset the offer and restore original sales price
         finalProduct.productOffer = 0;
 
-        // Safely assign the salesPrice back to the regularPrice
         const regularPrice = Number(finalProduct.regularPrice);
         if (isNaN(regularPrice)) {
             return res.json({ success: false, message: "Invalid regular price" });
