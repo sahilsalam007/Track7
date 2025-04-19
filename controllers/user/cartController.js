@@ -47,7 +47,8 @@ const getCartPage = async (req, res) => {
             user,
             quantity: user.cart.reduce((acc, item) => acc + item.quantity, 0),
             data,
-            grandTotal,
+            grandTotal: typeof grandTotal !== 'undefined' ? grandTotal : 0
+
         });
     } catch (error) {
         console.error("Error in getCartPage:", error);

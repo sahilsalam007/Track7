@@ -39,11 +39,7 @@ const addCategory = async (req,res) =>{
         })
 
         await newCategory.save()
-        return res.status(201).json({
-            success:true,
-            message:"Category added successfully"
-        });
-
+        return res.status(201).json({success:true,message:"Category added successfully"});
 
     } catch (error) {
         
@@ -53,6 +49,7 @@ const addCategory = async (req,res) =>{
         });
     }
 };
+
 
 const addCategoryOffer = async (req, res) => {
     try {
@@ -72,7 +69,6 @@ const addCategoryOffer = async (req, res) => {
         for (const product of products) {
             const regularPrice = Number(product.regularPrice);
             const productOffer = product.productOffer || 0;
-
             const highestOffer = Math.max(productOffer, percentage);
             const newSalesPrice = Math.floor(regularPrice * (1 - highestOffer / 100));
 

@@ -85,7 +85,7 @@
                     <option value="salesWeekly" <%= day === "salesWeekly" ? "selected" : "" %>>This Week</option>
                     <option value="salesMonthly" <%= day === "salesMonthly" ? "selected" : "" %>>This Month</option>
                     <option value="salesYearly" <%= day === "salesYearly" ? "selected" : "" %>>This Year</option>
-                    <option value="custom" <%= day === "custom" ? "selected" : "" %>>Custom</option>
+                    <!-- <option value="custom" <%= day === "custom" ? "selected" : "" %>>Custom</option> -->
                 </select>
             </div>
 
@@ -252,22 +252,22 @@
         });
     });
 
-    const select = document.getElementById("dateSelector");
-    const startDateInput = document.getElementById("startDateInput");
-    const endDateInput = document.getElementById("endDateInput");
-    function toggleInput() {
-        if (select.value === "custom") {
-            startDateInput.disabled = false;
-            endDateInput.disabled = false;
-        } else {
-            startDateInput.disabled = true;
-            endDateInput.disabled = true;
-        }
-    }
+    // const select = document.getElementById("dateSelector");
+    // const startDateInput = document.getElementById("startDateInput");
+    // const endDateInput = document.getElementById("endDateInput");
+    // function toggleInput() {
+    //     if (select.value === "custom") {
+    //         startDateInput.disabled = false;
+    //         endDateInput.disabled = false;
+    //     } else {
+    //         startDateInput.disabled = true;
+    //         endDateInput.disabled = true;
+    //     }
+    // }
 
-    toggleInput();
+    // toggleInput();
 
-    select.addEventListener("change", toggleInput);
+    select.addEventListener("change");
 </script>
 
 <%- include("../../views/partials/admin/footer") %>

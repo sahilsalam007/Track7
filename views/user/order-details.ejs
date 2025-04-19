@@ -362,12 +362,29 @@
                 </div>
                 <div class="action-buttons">
                     <a href="/orders" class="btn btn-danger !important">← Back to Orders</a>
-                    <% if (order.status === 'Pending' || order.status === 'Processing') { %>
-                        <form action="/cancel-order/<%= order.orderId %>" method="post"
-                            style="display: inline;">
-                            <button type="submit" class="btn btn-warning !important">Cancel Order</button>
-                        </form>
-                    <% } %>
+                    <% order.orderedItems.forEach(item => { %>
+                        <div class="order-item">
+                            <img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="Product Image">
+                            <div class="item-details">
+                                <h4 class="names"><%= item.product.productName %></h4>
+                                <div class="item-info">
+                                    <p>Quantity: <%= item.quantity %></p>
+                                    <p>Price: ₹<%= item.price.toFixed(2) %></p>
+                                </div>
+                                <% if (order.status !== 'Delivered' && item.productStatus !== 'Cancelled') { %>
+                                    <button type="button" class="btn btn-warning" onclick="confirmCancel('<%= order.orderId %>', '<%= item._id %>')">
+                                        Cancel Item
+                                    </button>
+                                <% } else if (item.productStatus === 'Cancelled') { %>
+                                    <p class="text-muted">Cancelled</p>
+                                <% } %>
+                            </div>
+                            <div class="item-total">
+                                <p>Total: ₹<%= (item.price * item.quantity).toFixed(2) %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                    
                 </div>
                 
             </div>
@@ -379,5 +396,43 @@
         </div>
     <% } %>
 </div>
+
+<script>
+    function confirmCancel(orderId, itemId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you really want to cancel this item? This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, Cancel it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/cancel-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: orderId, itemId: itemId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === "Item cancelled successfully") {
+                        Swal.fire({
+                            title: "Cancelled!",
+                            text: "Your item has been cancelled and refunded.",
+                            icon: "success"
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire("Error!", data.message || "Something went wrong.", "error");
+                    }
+                })
+                .catch(() => {
+                    Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                });
+            }
+        });
+    }
+    </script>
+    
 
 <%- include("../partials/user/footer") %>

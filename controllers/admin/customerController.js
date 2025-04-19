@@ -19,7 +19,7 @@ const customerInfo=async(req,res)=>{
                     {email:{$regex:".*"+search+".*"}}
                 ],
              })
-             .limit(limit*1)
+             .limit(limit)
              .skip((page-1)*limit)
              .exec();
              
@@ -54,6 +54,7 @@ const customerBlocked=async (req,res)=>{
         res.status(500).redirect("/pageerror")
     }
 };
+
 
  const customerunBlocked=async (req,res)=>{
     try{

@@ -356,7 +356,22 @@ function confirmRemove(productId) {
             }
         });
         
+
     </script>
+
+
+<% if (typeof swal !== 'undefined') { %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: "<%= swal.title %>",
+            text: "<%= swal.text %>",
+            icon: "<%= swal.icon %>",
+        
+        });
+    </script>
+    <% } %>
     
+
 
     <%- include("../../views/partials/user/footer") %>

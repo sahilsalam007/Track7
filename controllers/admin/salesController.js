@@ -10,7 +10,7 @@ const getSalesReport = async (req, res) => {
         const { page = 1, day, startDate, endDate } = req.query;
         const limit = 10;
         const skip = (page - 1) * limit;
-        let query = { 'payment.status':'Paid' }; 
+        let query = { 'payment.status': 'Paid' }; 
         let errors = [];
 
         if (startDate && endDate) {
@@ -48,6 +48,21 @@ const getSalesReport = async (req, res) => {
             }
 
             query.createdOn = { $gte: start, $lte: end };
+        } else if (day === 'custom') {
+            errors.push("Please provide both startDate and endDate for custom filter.");
+            return res.render('sales-report', { 
+                errors, 
+                data: [], 
+                currentPage: parseInt(page), 
+                totalPages: 1, 
+                startDate, 
+                endDate, 
+                day, 
+                totalOrders: 0,
+                totalSales: 0,
+                totalDiscounts: 0,
+                grandTotal: 0
+            });
         }
 
         let filterFlags = {
@@ -111,7 +126,7 @@ const getSalesReport = async (req, res) => {
 
         const totalPages = Math.ceil(salesMetrics.totalOrders / limit);
 
-        res.render('sales-report', {
+        res.status(200).render('sales-report', {
             data: orders,
             currentPage: parseInt(page),
             totalPages,

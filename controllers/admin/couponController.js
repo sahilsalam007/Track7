@@ -1,14 +1,29 @@
 const Coupon=require("../../models/couponSchema");
 const mongoose=require("mongoose")
 
-const loadCoupon=async(req,res)=>{
+const loadCoupon = async (req, res) => {
     try {
-        const findCoupons=await Coupon.find({});
-        return res.render("coupon",{coupons:findCoupons})
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+        const [coupons, totalCoupons] = await Promise.all([
+            Coupon.find({}).skip(skip).limit(limit),
+            Coupon.countDocuments()
+        ]);
+
+        const totalPages = Math.ceil(totalCoupons / limit);
+
+        return res.status(200).render("coupon", {
+            coupons,
+            currentPage: page,
+            totalPages
+        });
     } catch (error) {
-        return res.redirect("/pageerror");
+        return res.status(500).redirect("/pageerror");
     }
-}
+};
+
 
 const createCoupon=async(req,res)=>{
     try {
@@ -27,9 +42,9 @@ const createCoupon=async(req,res)=>{
             minimumPrice:data.minimumPrice
         });
         await newCoupon.save();
-        return res.redirect("/admin/coupon");
+        return res.status(201).redirect("/admin/coupon");
     } catch (error) {
-        res.redirect("/pageerror")
+        res.status(500).redirect("/pageerror")
     }
 }
 
@@ -41,7 +56,7 @@ const editCoupon=async(req,res)=>{
             findCoupon:findCoupon,
         })
     } catch (error) {
-        res.redirect("/pageerror")
+      return res.status(500).redirect("/pageerror")
     }
 }
 
@@ -66,13 +81,13 @@ const updateCoupon=async(req,res)=>{
                 },{new:true}
             );
             if(updatedCoupon !==null){
-                res.send("Coupon updated successfully")
+                return res.status(200).send("Coupon updated successfully")
             }else{
-                res.status(404).send("Coupon update failed ")
+                return res.status(404).send("Coupon update failed ")
             }
         }
     } catch (error) {
-        res.redirect("/pageerror")
+       return res.status(500).redirect("/pageerror")
     }
 }
 

@@ -14,8 +14,6 @@ const getorderDetails = async (req,res) => {
         if (!order) {
             return res.status(404).render('admin/error', { message: 'Order not found' });
         }
-        // console.log('order data:',order)
-        // console.log('order Items:',order.orderedItems)
         res.status(200).render('admin-order-details', { order });        
     } catch (error) {
         console.error('Error fetching order details:', error)
@@ -50,7 +48,7 @@ const updateStatus = async (req,res) => {
 };
 
 
-const getOrderList = async (req, res) => {
+const getOrderList = async (req, res) => { 
     try {
         const searchQuery = req.query.search ? req.query.search.trim() : '';       
         const page = parseInt(req.query.page) || 1;
@@ -90,8 +88,7 @@ const getOrderList = async (req, res) => {
 };
 
 
-const getorder=async(req,res)=>
-{
+const getorder = async(req, res) => {
     try {
         const search = req?.query?.search?.trim();
         const filter={};

@@ -187,6 +187,24 @@
                      <%}%>
                  </tbody>
              </table>
+             <div class="pagination d-flex justify-content-center mt-3">
+              <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline-primary mx-1">Previous</a>
+              <% } %>
+            
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                <a 
+                  href="?page=<%= i %>" 
+                  class="btn <%= i === currentPage ? 'btn-primary' : 'btn-outline-primary' %> mx-1">
+                  <%= i %>
+                </a>
+              <% } %>
+            
+              <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline-primary mx-1">Next</a>
+              <% } %>
+            </div>
+            
          </div>
      </div>
      </div>
