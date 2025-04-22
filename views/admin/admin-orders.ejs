@@ -325,7 +325,7 @@
                 Swal.fire('Error!', result.message, 'error');
             }
         } catch (error) {
-            console.error('Error updating status:', error);
+            console.error('Error updating status:', error.message);
             Swal.fire('Error!', 'Something went wrong.', 'error');
         }
     }

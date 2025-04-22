@@ -243,10 +243,10 @@ const loadShoppingPage = async (req, res) => {
             category: req.query.category || '',
             brand: req.query.brand || '',
             maxPrice: req.query.maxPrice || '',
-            minPrice: req.query.minPrice || ''
+            minPrice: req.query.minPrice || '',
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 12
         };
-
-        console.log(query);
 
         const filter = {
             isBlocked: false,
@@ -260,9 +260,11 @@ const loadShoppingPage = async (req, res) => {
         if (query.category) {
             filter.category = query.category;
         }
+
         if (query.brand) {
             filter.brand = query.brand;
         }
+
         if (query.minPrice || query.maxPrice) {
             filter.salesPrice = {};
             if (query.minPrice) filter.salesPrice.$gte = parseInt(query.minPrice);
@@ -287,13 +289,21 @@ const loadShoppingPage = async (req, res) => {
                 sortOptions = { createdAt: -1 };
         }
 
+        const totalProducts = await Product.countDocuments(filter);
+        const totalPages = Math.ceil(totalProducts / query.limit);
+        const skip = (query.page - 1) * query.limit;
+
         const [products, categories, brands] = await Promise.all([
-            Product.find(filter).sort(sortOptions).populate("category").populate("brand"),
+            Product.find(filter)
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(query.limit)
+                .populate("category")
+                .populate("brand"),
             Category.find({ isListed: true }),
             Brand.find()
         ]);
 
-        // ✅ Calculate best offer (product/category) for each product
         const updatedProducts = products.map(product => {
             const regularPrice = product.regularPrice;
             const productOffer = product.productOffer || 0;
@@ -329,7 +339,9 @@ const loadShoppingPage = async (req, res) => {
             userData,
             isLoggedIn: !!userId,
             wishlistItems,
-            cartItems 
+            cartItems,
+            currentPage: query.page,
+            totalPages
         });
 
     } catch (error) {

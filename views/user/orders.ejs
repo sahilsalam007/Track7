@@ -147,7 +147,7 @@
                 <div class="checkout-section">
                     <div class="order-header">
                         <div>
-                            <h3>Order #<%= order.orderId.slice(0,12) %></h3>
+                            <h3>Order #<%= order.orderId%></h3>
                             <p class="text-muted"><%= new Date(order.createdOn).toDateString() %></p>
                         </div>
                         <div class="order-status 
@@ -157,7 +157,7 @@
     <% } else if (order.status === 'Delivered') { %>status-delivered
     <% } else if (order.status === 'Cancelled') { %>status-cancelled
     <% } %>">
-    <%= (order.orderedItems.length === 1 && order.orderedItems[0].productStatus === 'Cancelled') ? 'Cancelled' : order.status %>
+    <%= (order.orderedItems.every(item=>item.productStatus==='Cancelled')) ? 'Cancelled' : order.status %>
 </div>
 
                     </div>

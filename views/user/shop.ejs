@@ -356,6 +356,7 @@
   .wishlist-icon.active i {
   color: red; /* Change to red when active */
 }
+
 .cart-btn {
     display: block;
     width: 100%;
@@ -395,6 +396,39 @@
   padding :10px 20px;
   cursor:pointer
 }
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-left: 305px;
+    gap: 8px;
+}
+
+.pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    color: #e63131;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.pagination a.active {
+    background-color: #f52a2a;
+    color: #fff;
+    border-color: #f52a2a;
+}
+
+.pagination a:hover {
+    background-color: #ff7373;
+    color: #fff;
+    border-color: #ff7373;
+}
 
 .product-name a {
     color: rgb(72, 77, 225) !important; /* Change 'red' to any color you want */
@@ -432,11 +466,20 @@
   <div class="main-container">
     <section class="shop-page">
       <div class="shop-topbar">
-        <form action="" method="GET" class="search-form" id="searchForm">
-          <input type="text" name="search" value="<%= query.search %>" placeholder="Search products..."
-            class="search-input">
-          <button type="submit" class="search-button">Search</button>
+        <form action="" method="GET" class="search-form" id="searchForm" style="display: flex; align-items: center;">
+          <input type="text" name="search" id="searchInput" value="<%= query.search %>" placeholder="Search products..." class="search-input" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px 0 0 8px; outline: none; flex: 1;">
+          
+          <button type="submit" class="search-button" style="background-color: #a8323e; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Search</button>
+        
+          <% if(query.search) { %>
+            <button type="button" class="clear-button" onclick="clearSearch()" title="Clear search"
+            style="background-color: white; color: black; border: 1px solid #ccc; padding: 10px 16px; border-left: none; border-radius: 0 8px 8px 0; cursor: pointer; font-size: 16px;">
+            ✖
+          </button>
+          <% } %>
         </form>
+        
+        
         <form action="/shop" method="GET" id="sortForm">
           <% if(query.category) { %>
             <input type="hidden" name="category" value="<%= query.category %>">
@@ -596,11 +639,32 @@
       </div>
     </section>
   </div>
-
+  
+  <div class="pagination">
+    <% if (currentPage > 1) { %>
+      <a href="?<%= `page=${currentPage - 1}` %>">...</a>
+    <% } %>
+  
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="?<%= `page=${i}` %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+    <% } %>
+  
+    <% if (currentPage < totalPages) { %>
+      <a href="?<%= `page=${currentPage + 1}` %>">...</a>
+    <% } %>
+  </div>
+  
 
 
   <!-- wishlist icon-->
   <script>
+
+function clearSearch() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('search');
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+  }
     $(document).ready(function () {
         $(".wishlist-icon, .wislist-btn").on("click", function (event) {
             event.stopPropagation();

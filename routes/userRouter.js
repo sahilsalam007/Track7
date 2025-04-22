@@ -16,7 +16,7 @@ const walletController=require("../controllers/user/walletController");
 
 //err and page navigation
 router.get("/pageNotFound",userController.pageNotFound);
-router.get("/",userController.loadHomepage);
+router.get("/",session,userController.loadHomepage);
 router.get("/shop",userAuth,session,userController.loadShoppingPage);
 
 

@@ -12,6 +12,20 @@ const{razorpayInstance,verifySignature}=require("../../config/razorPay")
 
 const PDFDocument = require('pdfkit')
 
+const generateOrderId = async () => {
+    const latestOrder = await Order.findOne().sort({ createdOn: -1 });
+
+    let lastId = 1000; // starting point if no orders exist yet
+    if (latestOrder && latestOrder.orderId) {
+        const match = latestOrder.orderId.match(/TRA(\d+)/);
+        if (match) {
+            lastId = parseInt(match[1]);
+        }
+    }
+
+    return `TRA${lastId + 1}`;
+};
+
 
 const orderPlaced = async (req, res) => {
     try {
@@ -73,7 +87,9 @@ const orderPlaced = async (req, res) => {
         }
         
 
+        const orderId = await generateOrderId();
         const newOrder = new Order({
+            orderId,
             userId,
             orderedItems: cart.map(item => ({
                 product: item.productId,
@@ -195,7 +211,9 @@ const verifyRazorpayPayment = async (req, res) => {
          const address = userAddress.address[0];
          const discount = 0;
          const finalAmount = totalPrice - discount;
+         const orderId = await generateOrderId();
          const newOrder = new Order({
+            orderId,
              userId,
              orderedItems,
              totalPrice,
@@ -671,8 +689,9 @@ const walletPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
         }
 
-
+        const orderId = await generateOrderId();
         const newOrder = new Order({
+            orderId,
             userId,
             orderedItems: cart.map(item => ({
                 product: item.productId,
@@ -693,7 +712,7 @@ const walletPayment = async (req, res) => {
                 altPhone: desiredAddress.altPhone
             },
             payment: {
-                method: "razorpay",
+                method: "wallet",
                 status: "Paid"
             },
             status: "Pending"

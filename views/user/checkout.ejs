@@ -298,7 +298,7 @@
                     <div class="coupon-section mb-3">
                         <div id="couponInputGroup" class="d-flex gap-2">
                             <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code">
-                            <button onclick="applyCoupon()" class="btn btn-sm mt-2">Apply</button>
+                            <!-- <button onclick="applyCoupon()" class="btn btn-sm mt-2">Apply</button> -->
                         </div>
                         <div id="appliedCoupon" style="display: none;" class="mt-2">
                             <span>Applied Coupon: <strong id="appliedCouponCode"></strong></span>
@@ -341,7 +341,7 @@
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-async function initiateRazorpayPayment(userId) {
+    async function initiateRazorpayPayment(userId) {
     const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
 
@@ -492,37 +492,37 @@ async function initiateRazorpayPayment(userId) {
             text: error.message,
         }).then(() => {
             window.location.href = "/order-failed";
-        });
+            });
+        }
     }
-}
 
 
-
-
-
-
-
-    async function placeOrder(userId) {
-        const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
-        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-        const totalPrice = parseFloat(document.getElementById('totalPriceValue').value);
-    
-        if (!selectedAddress) {
-            alert("Please select a delivery address.");
+            async function placeOrder(userId) {
+                const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+                const totalPrice = parseFloat(document.getElementById('totalPriceValue').value);
+            
+                if (!selectedAddress) {
+                    alert("Please select a delivery address.");
+                    return;
+                }
+            
+                if (!paymentMethod) {
+            Swal.fire({
+                icon: "warning",
+                title: "No Payment Method Selected",
+                text: "Please select a payment method before continuing.",
+                confirmButtonColor: "#3085d6"
+            });
             return;
-        }
+            }
     
-        if (!paymentMethod) {
-            alert("Please select a payment method.");
-            return;
-        }
-    
-        const addressId = selectedAddress.dataset.addressId;
-    
-        if (paymentMethod.value === 'razorpay') {
-            initiateRazorpayPayment(userId);
-        } else if (paymentMethod.value === 'COD') {
-            try {
+            const addressId = selectedAddress.dataset.addressId;
+        
+                if (paymentMethod.value === 'razorpay') {
+                initiateRazorpayPayment(userId);
+                } else if (paymentMethod.value === 'COD') {
+                try {
                 const response = await fetch("/orderPlaced", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -536,56 +536,73 @@ async function initiateRazorpayPayment(userId) {
     
                 const result = await response.json();
                 if (result.success) {
-                    alert("Order placed successfully!");
-                    window.location.href = "/order-success";
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Placed!",
+                        text: "Your order has been placed successfully.",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        window.location.href = "/order-success";
+                    });
                 } else {
-                    alert(result.error || "Failed to place order.");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Order Failed",
+                        text: result.error || "Failed to place order.",
+                        confirmButtonColor: "#d33"
+                    });
                 }
-            } catch (error) {
-                console.error("Error placing order:", error);
-                alert("An error occurred while placing the order.");
-            }
-        } else if (paymentMethod.value === 'wallet') {
-             try{
-             const response = await fetch("/walletPayment", {
-                 method: "POST",
-                 headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({
-                     userId: userId,
-                     addressId: addressId,
-                     totalPrice,
-                     paymentMethod: paymentMethod.value, 
-                 })
-             });
- 
-             const result = await response.json();
-             if (result.success) {
-                 Swal.fire({
-                     icon: "success",
-                     title: "Order Placed!",
-                     text: "Payment was successful using wallet.",
-                 }).then(() => {
-                     window.location.href = "/order-success";
-                 });
-             } else {
-                 Swal.fire({
-                     icon: "error",
-                     title: "Payment Failed",
-                     text: result.error || "Insufficient wallet balance.",
-                 });
-             }
-            }
-        
- 
-      catch (error) {
-         Swal.fire({
-             icon: "error",
-             title: "An Error Occurred",
-             text: "Something went wrong while placing the order.",
-         });
-     }
- }
-}
+                
+                } catch (error) {
+                    console.error("Error placing order:", error);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Something went wrong",
+                        text: "An error occurred while placing the order.",
+                        confirmButtonColor: "#d33"
+                    });
+                }
+                } else if (paymentMethod.value === 'wallet') {
+                     try{
+                     const response = await fetch("/walletPayment", {
+                         method: "POST",
+                         headers: { "Content-Type": "application/json" },
+                         body: JSON.stringify({
+                             userId: userId,
+                             addressId: addressId,
+                             totalPrice,
+                             paymentMethod: paymentMethod.value, 
+                         })
+                     });
+         
+                     const result = await response.json();
+                     if (result.success) {
+                         Swal.fire({
+                             icon: "success",
+                             title: "Order Placed!",
+                             text: "Payment was successful using wallet.",
+                         }).then(() => {
+                             window.location.href = "/order-success";
+                         });
+                     } else {
+                         Swal.fire({
+                             icon: "error",
+                             title: "Payment Failed",
+                             text: result.error || "Insufficient wallet balance.",
+                         });
+                     }
+                    }
+                
+         
+    catch (error) {
+        Swal.fire({
+           icon: "error",
+           title: "An Error Occurred",
+           text: "Something went wrong while placing the order.",
+                  });
+                  }
+                }
+              }
     
     function editAddress(index, id, name, addressType, city, landMark, state, pincode, phone) {
         document.getElementById("addressIndex").value = index;
@@ -663,10 +680,11 @@ async function initiateRazorpayPayment(userId) {
             });
             const result=await response.json();
             if(result.success){
-                appliedCouponCode=couponCode;
-                updatePriceDisplay(result.discount,result.finalPrice);
-                showCouponUI(couponCode);
-                showCouponMessage("Coupon applied successfully!","green");
+                appliedCouponCode = couponCode;
+    updatePriceDisplay(result.discount, result.finalPrice);
+    document.getElementById("couponCode").value = couponCode; // ✅ This sets the input box
+    showCouponUI(couponCode);
+    showCouponMessage("Coupon applied successfully!", "green");
             }else{
                 showCouponMessage(result.message,"green");
             }

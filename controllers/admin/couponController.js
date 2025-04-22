@@ -46,7 +46,8 @@ const createCoupon=async(req,res)=>{
     } catch (error) {
         res.status(500).redirect("/pageerror")
     }
-}
+};
+
 
 const editCoupon=async(req,res)=>{
     try {
@@ -58,7 +59,8 @@ const editCoupon=async(req,res)=>{
     } catch (error) {
       return res.status(500).redirect("/pageerror")
     }
-}
+};
+
 
 const updateCoupon=async(req,res)=>{
     try {
@@ -89,7 +91,8 @@ const updateCoupon=async(req,res)=>{
     } catch (error) {
        return res.status(500).redirect("/pageerror")
     }
-}
+};
+
 
 const deleteCoupon=async(req,res)=>{
     try {
@@ -101,7 +104,9 @@ const deleteCoupon=async(req,res)=>{
         res.status(500).send({success:false,message:"Failed to delete coupon"})
     }
 
-}
+};
+
+
 module.exports={
     loadCoupon,
     createCoupon,

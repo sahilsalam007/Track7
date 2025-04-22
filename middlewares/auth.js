@@ -58,16 +58,30 @@ const adminAuth=(req,res,next)=>{
 };
 
 
+const session = async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            const user = await User.findById(req.session.user);
 
-const session=async(req, res, next) => {
-    try{
-        const user=await User.findById(req.session.user)
-        res.locals.user = user || null; 
-        next();
-    }catch(error){
-        console.log(error.message)
+            if (!user || user.isBlocked) {
+                req.session.destroy(() => {
+                    res.locals.user = null; // 🧹 Don't pass any user to views
+                    return res.redirect('/');
+                });
+            } else {
+                res.locals.user = user; // ✅ only if user is valid & not blocked
+                next();
+            }
+        } else {
+            res.locals.user = null;
+            next();
+        }
+    } catch (error) {
+        console.log("Error in session middleware:", error.message);
+        res.status(500).send("Internal Server Error");
     }
 };
+
 
 module.exports={
     userAuth,

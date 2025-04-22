@@ -309,7 +309,7 @@
     <% if (order) { %>
             <div class="order-section">
                 <div class="order-header">
-                    <h2 class="order-id">Order #<%= order.orderId.slice(0,12) %></h2>
+                    <h2 class="order-id">Order #<%= order.orderId%></h2>
                     <span class="order-status status-<%= order.status.toLowerCase().replace(' ', '-') %>">
                         <%= order.status %>
                     </span>

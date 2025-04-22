@@ -4,6 +4,7 @@ const User = require("../../models/userSchema");
 const Brand = require('../../models/brandSchema')
 const Wishlist = require("../../models/wishlistSchema")
 
+
 const productDetails = async (req, res) => {
   try {
     const userId = req.session.user?._id;

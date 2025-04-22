@@ -5,7 +5,7 @@ const {v4:uuidv4}=require("uuid");
 const orderSchema=new Schema({
     orderId:{
         type:String,
-        default:()=>uuidv4(),
+        required:true,
         unique:true
     },
     userId: {
@@ -84,9 +84,9 @@ const orderSchema=new Schema({
             signature: String
         }
     },
-    status: {
+    status: {   
         type: String,
-        enum: ["Pending", "confirmed", "processing", "shipped", "Delivered", "cancelled", "return-requested", "returned","Failed"],
+        enum: ["Pending", "confirmed", "Processing", "Shipped", "Delivered", "Cancelled", "return-requested", "returned","Failed"],
         default: "pending"
     },
 })

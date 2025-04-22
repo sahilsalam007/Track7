@@ -35,9 +35,9 @@
                         <td><%= user.phone %></td>
                         <td>
                             <% if (user.isBlocked === false) { %>
-                                <a href="/admin/blockCustomer?id=<%= user._id %>" class="btn btn-danger px-4 py-1">Block</a>
+                                <a href="#" class="btn btn-danger px-4 py-1" onclick="confirmBlock('<%= user._id %>')">Block</a>
                             <% } else { %>
-                                <a href="/admin/unblockCustomer?id=<%= user._id %>" class="btn btn-success px-4 py-1">Unblock</a>
+                                <a href="#" class="btn btn-success px-4 py-1" onclick="confirmUnblock('<%= user._id %>')">Unblock</a>
                             <% } %>
                         </td>
                     </tr>
@@ -62,5 +62,40 @@
         </ul>
     </nav>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmBlock(userId){
+        Swal.fire({
+            title:"Are you sure?",
+            text:"You are about to block this customer.",
+            icon:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#d33",
+            cancelButtonColor:"#3085d6",
+            confirmButtonText:"Yes, block them!"
+        }).then((result)=>{
+            if(result.isConfirmed){
+                window.location.href=`/admin/blockCustomer?id=${userId}`;
+            }
+        })
+    }
+
+    function confirmUnblock(userId){
+        Swal.fire({
+            title:"Are you sure?",
+            text:"You are about to unblock this customer.",
+            icon:"question",
+            showCancelButton:true,
+            confirmButtonColor:'#28a745',
+            cancelButtonColor:'#6c757d',
+            confirmButtonText:"Yes, unblock them!"
+        }).then((result)=>{
+            if(result.isConfirmed){
+                window.location.href=`/admin/unblockCustomer?id=${userId}`;
+            }
+        })
+    }
+</script>
 
 <%- include("../../views/partials/admin/footer") %>
