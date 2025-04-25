@@ -379,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <script>
   // Store the transactions in a variable (this will be from the EJS template)
-  const transactions = '<%=wallet.transactions%>' ; // This is correct. No need for `${}`
+  const transactions = <%- JSON.stringify(wallet.transactions) %>; // This is correct. No need for `${}`
 
   const transactionsPerPage = 10; // Number of transactions per page
   let currentPage = 1; // Start on the first page

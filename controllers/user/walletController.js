@@ -9,7 +9,7 @@ const getWallet = async (req, res) => {
         }
 
         let wallet = await Wallet.findOne({ userId });
-
+        
         if (!wallet) {
             const newWallet = new Wallet({
                 userId,
@@ -20,12 +20,12 @@ const getWallet = async (req, res) => {
             return res.render("profile", { wallet: newWallet });
         }
 
-        wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
        
-        console.log(new Date(a.createdAt), new Date(b.createdAt)); 
+        // console.log(new Date(a.createdAt), new Date(b.createdAt)); 
 
 
-        res.render("profile", { wallet });
+        res.render("wallet", { wallet });
     } catch (error) {
         console.error("Error fetching wallet:", error);
         res.status(500).send("Internal Server error");

@@ -412,16 +412,17 @@
     height: 40px;
     border: 1px solid #ccc;
     text-decoration: none;
-    color: #e63131;
+    color: #b02a37;
     border-radius: 6px;
     font-weight: bold;
+    margin-bottom: 10px;
     transition: background-color 0.3s;
 }
 
 .pagination a.active {
-    background-color: #f52a2a;
+    background-color: #b02a37;
     color: #fff;
-    border-color: #f52a2a;
+    border-color: #b02a37;
 }
 
 .pagination a:hover {
@@ -452,6 +453,19 @@
 
 .apply-filters-btn:hover {
     background-color: #d24554;
+}
+.sort-dropdown {
+    padding: 6px 12px;
+    font-size: 15px;
+    border: 1.5px solid #ff4500; /* Hot Wheels vibe */
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+}
+
+.sort-dropdown:focus {
+    outline: none;
+    border-color: #ff7b00;
 }
 
 </style>
@@ -539,17 +553,23 @@
           <div class="filter-section">
             <h3 class="filter-title">Price Range</h3>
             <div class="price-filters">
-              <input type="checkbox" class="filter-checkbox" name="price" value="0-500" />
-              <label>Under ₹500</label>
+              <!-- <input type="checkbox" class="filter-checkbox" name="price" value="0-500" />
+              <label>Under ₹500</label> -->
         
-              <input type="checkbox" class="filter-checkbox" name="price" value="500-1000" />
+              <div class="checkbox-group">
+                <input type="checkbox" class="filter-checkbox" name="price" value="500-1000" />
               <label>₹500 - ₹1000</label>
+              </div>
         
-              <input type="checkbox" class="filter-checkbox" name="price" value="1000-1500" />
+              <div class="checkbox-group">
+                <input type="checkbox" class="filter-checkbox" name="price" value="1000-1500" />
               <label>₹1000 - ₹1500</label>
+              </div>
         
-              <input type="checkbox" class="filter-checkbox" name="price" value="1500-null" />
+              <div class="checkbox-group">
+                <input type="checkbox" class="filter-checkbox" name="price" value="1500-null" />
               <label>Above ₹1500</label>
+              </div>
             </div>
           </div>
         

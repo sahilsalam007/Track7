@@ -28,7 +28,7 @@ const applyCoupon=async(req,res)=>{
         if(cartTotal<coupon.minimumPrice){
             return res.json({
                 success:false,
-                success:`Minimum cart total must be ${coupon.minimumPrice}to apply this coupon.`
+                message:`Minimum cart total must be ${coupon.minimumPrice}to apply this coupon.`
             });
         }
         const discount=coupon.offerPrice;

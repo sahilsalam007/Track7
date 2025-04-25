@@ -124,6 +124,7 @@ const getAllProducts=async (req,res)=>{
     }
 };
 
+
 const addProductOffer = async (req, res) => {
     try {
         const { productId, percentage } = req.body;
@@ -195,6 +196,7 @@ const removeProductOffer = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
 
 const blockProduct=async (req,res)=>{
     try{

@@ -8,7 +8,7 @@ const loadCoupon = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const [coupons, totalCoupons] = await Promise.all([
-            Coupon.find({}).skip(skip).limit(limit),
+            Coupon.find({}).sort({createdOn:-1}).skip(skip).limit(limit),
             Coupon.countDocuments()
         ]);
 

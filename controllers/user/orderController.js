@@ -1,28 +1,28 @@
-const Order = require('../../models/orderSchema')
-const Product = require('../../models/productSchema')
-const mongoose = require('mongoose')
-const User = require('../../models/userSchema')
-const Address = require('../../models/addressSchema')
-const Cart = require('../../models/cartSchema')
+const Order = require('../../models/orderSchema');
+const Product = require('../../models/productSchema');
+const mongoose = require('mongoose');
+const User = require('../../models/userSchema');
+const Address = require('../../models/addressSchema');
+const Cart = require('../../models/cartSchema');
 const Razorpay = require("razorpay");
-const Wallet=require("../../models/walletSchema")
+const Wallet=require("../../models/walletSchema");
+const Coupon=require("../../models/couponSchema");
 const crypto = require("crypto");
-require('dotenv').config()
-const{razorpayInstance,verifySignature}=require("../../config/razorPay")
+require('dotenv').config();
+const{razorpayInstance,verifySignature}=require("../../config/razorPay");
+const PDFDocument = require('pdfkit');
 
-const PDFDocument = require('pdfkit')
 
 const generateOrderId = async () => {
     const latestOrder = await Order.findOne().sort({ createdOn: -1 });
 
-    let lastId = 1000; // starting point if no orders exist yet
+    let lastId = 1000;
     if (latestOrder && latestOrder.orderId) {
         const match = latestOrder.orderId.match(/TRA(\d+)/);
         if (match) {
             lastId = parseInt(match[1]);
         }
     }
-
     return `TRA${lastId + 1}`;
 };
 
@@ -131,28 +131,49 @@ const razorpay = new Razorpay({
 
 const createRazorpayOrder = async (req, res) => {
     try {
-        const { userId,totalPrice } = req.body;
-        
-        const discount = 0;
-        const finalAmount = totalPrice - discount;
-       
+        const { userId, couponCode, taxAmount = 0 } = req.body;
+
+        const user = await User.findById(userId).populate("cart.productId");
+        if (!user) {
+         
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+
+        let totalPrice = 0;
+        for (const item of user.cart) {
+            totalPrice += item.productId.salesPrice * item.quantity;
+        }
+
+        let discount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode });
+            if (coupon) discount = coupon.offerPrice;
+        }
+        console.log("total discount is",discount)
+
+        const finalAmount = totalPrice + taxAmount - discount;
+         console.log(finalAmount)
         const response = await razorpay.orders.create({
-            amount: finalAmount * 100,
+            amount: (finalAmount * 100), 
             currency: "INR",
-            receipt: userId+new Date().getDate()
+            receipt: userId + "-" + new Date().getTime()
         });
-        
+
         res.json({
             success: true,
             orderId: response.id,
             currency: response.currency,
-            amount: response.amount
+            amount: response.amount,
+            finalAmount,
+            discount,
+            taxAmount
         });
     } catch (error) {
         console.warn("Error creating Razorpay order:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 
 const verifyRazorpayPayment = async (req, res) => {
@@ -345,8 +366,6 @@ const createFailedOrder = async (req, res) => {
         }
 
 
-         
-       // console.log(selectedAddress)
         if (!selectedAddress) {
             return res.status(400).json({ error: "Invalid address." });
         }
@@ -451,7 +470,7 @@ const downloadInvoice = async (req, res, next) => {
       doc
         .fontSize(16)
         .font('Helvetica')
-        .text('PURE THREADS', doc.page.width - 240, 80)
+        .text('Track7', doc.page.width - 240, 80)
         .fontSize(12)
         .text('Your Shopping Partner', doc.page.width - 240, 100)
 

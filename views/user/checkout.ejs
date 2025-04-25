@@ -363,24 +363,27 @@
 
     try {
         const orderResponse = await fetch("/create-razorpay-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: userId,
-                totalPrice: totalPrice
-            })
-        });
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        userId: userId,
+        totalPrice: totalPrice,
+        couponCode: appliedCouponCode, // ✅ Send applied coupon
+        taxAmount: parseFloat(document.getElementById("taxAmountValue").value) // ✅ Send tax amount
+    })
+});
+
 
         const orderResult = await orderResponse.json();
-        console.log(orderResult)
+        console.log(discount)
         if (!orderResult.success) {
             throw new Error(orderResult.error || "Failed to create order");
         }
         const razorpayOptions = {
             key: "<%= process.env.RAZORPAY_KEY_ID %>",  
-            amount: totalPrice * 100,
+            amount: (totalPrice * 100)-discount,
             currency: "INR",
-            name: "Your Store Name",
+            name: "Track 7",
             description: "Order Payment",
             order_id: orderResult.orderId,
             retry: false ,
