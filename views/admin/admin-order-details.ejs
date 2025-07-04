@@ -145,7 +145,7 @@
         <h2 style="color: rgb(243, 0, 0)">Order Details</h2>
         
         <div class="order-info">
-            <p><strong>Order ID:</strong> <%= order._id %></p>
+            <p><strong>Order ID:</strong> <%= order.orderId %></p>
             <p><strong>Order Date:</strong> <%= new Date(order.createdOn).toLocaleString() %></p>
             <p><strong>Status:</strong> <span class="status <%= order.status.toLowerCase() %>"><%= order.status %></span></p>
         </div>

@@ -87,7 +87,6 @@ return false;
 const signup=async(req,res)=>{
     try{
         const {name,phone,email,password,confirmPassword}=req.body;
-        console.log(req.body)
         if(password!==confirmPassword){
             return res.render("signup",{message:"Passwords do not match"})
         }
@@ -193,7 +192,6 @@ const loadLogin=async(req,res)=>{
 const login=async(req,res)=>{
     try{
         const {email,password}=req.body;
-        console.log("woring")
         const findUser=await User.findOne({isAdmin:0,email:email})
         if(!findUser){
             return res.render("login",{message:"User not found"})

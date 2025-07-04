@@ -109,7 +109,7 @@ const getSalesReport = async (req, res) => {
             .limit(limit)
             .sort({ createdOn: -1 })
             .lean();
-
+        console.log("Sample Order:", orders[0]);
         const allOrders = await Order.find(query).populate('userId').lean();
 
         const salesMetrics = allOrders.reduce((acc, order) => ({
@@ -145,29 +145,19 @@ const getSalesReport = async (req, res) => {
 
 
 
-const downloadPDF=async(req, res,next) => {
+const downloadPDF = async (req, res, next) => {
     try {
-
-
         let { day, startDate, endDate } = req.query;
-        let query = { 'payment.status':'Paid' }; 
+        let query = { 'payment.status': 'Paid' };
 
         const today = new Date();
         let fromDate = null;
-        let toDate = today;
+        let toDate = new Date();
 
-        if (day === "salesToday") {
-            fromDate = new Date();
-        } else if (day === "salesWeekly") {
-            fromDate = new Date();
-            fromDate.setDate(today.getDate() - 7);
-        } else if (day === "salesMonthly") {
-            fromDate = new Date();
-            fromDate.setMonth(today.getMonth() - 1);
-        } else if (day === "salesYearly") {
-            fromDate = new Date();
-            fromDate.setFullYear(today.getFullYear() - 1);
-        }
+        if (day === "salesToday") fromDate = new Date();
+        else if (day === "salesWeekly") fromDate = new Date(today.setDate(today.getDate() - 7));
+        else if (day === "salesMonthly") fromDate = new Date(today.setMonth(today.getMonth() - 1));
+        else if (day === "salesYearly") fromDate = new Date(today.setFullYear(today.getFullYear() - 1));
 
         if ((!startDate || !endDate) && fromDate) {
             startDate = fromDate.toISOString().split("T")[0];
@@ -190,7 +180,7 @@ const downloadPDF=async(req, res,next) => {
         query.createdOn = { $gte: start, $lte: end };
 
         const orders = await Order.find(query)
-            .populate("userId", "firstName email")
+            .populate("userId", "name email")
             .populate({
                 path: "orderedItems.product",
                 model: "Product",
@@ -199,86 +189,114 @@ const downloadPDF=async(req, res,next) => {
             .sort({ createdOn: -1 })
             .lean();
 
-            console.log(orders);
-
-
-        const orderDetails=orders.map((order)=>{
+        const orderDetails = orders.map(order => {
+            const tax = +(order.finalAmount * 0.10).toFixed(2);
             return {
-                    orderId:order?.orderId,
-                    orderDate:order?.createdOn,
-                    itemsCount:order.orderedItems.length,
-                    usedCoupon:"djlkf",
-                    customer:"sahil",
-                    amount:order?.finalAmount
-                }
-        })
+                orderId: order?.orderId || 'N/A',
+                orderDate: order?.createdOn || new Date(),
+                itemsCount: order.orderedItems?.length || 0,
+                customer: `${order.userId?.name || 'N/A'}`,
+                discount: order?.discount || 0,
+                tax: tax,
+                amount: order?.finalAmount || 0,
+                totalBeforeTax: order.finalAmount || 0
+            };
+        });
 
-      const doc = new PDFDocument({
-        size: 'A4',
-        margins: { top: 50, left: 40, right: 40, bottom: 50 },
-      });
+        const totalOrders = orderDetails.length;
+        const totalSales = orderDetails.reduce((acc, o) => acc + o.totalBeforeTax, 0);
+        const totalDiscount = orderDetails.reduce((acc, o) => acc + o.discount, 0);
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="sales-report.pdf"');
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({
+            size: 'A4',
+            margins: { top: 50, left: 40, right: 40, bottom: 50 },
+        });
 
-      doc.pipe(res);
-  
-      doc.fontSize(20).font('Helvetica-Bold').text('Sales Report', { align: 'center' }).moveDown();
- 
-      doc.fontSize(12).text(`Report Date: ${today}`, { align: 'right' }).moveDown();
-  
-      doc.rect(20, doc.y, 550, 20).fillAndStroke('#000000', '#00000');
-      doc
-      .font('Helvetica-Bold')
-        .fillColor('#ffffff')
-        .fontSize(12)
-        .text('Order ID', 55, doc.y + 5, { width: 200 })
-        .text('order Date', 175, doc.y - 15 , { width: 70 })
-        .text('Items Count', 270, doc.y - 14, { width: 100 })
-        .text('Customer', 400, doc.y - 14, { width: 100 })
-        .text('Amount', 500, doc.y - 14, { width: 100 })
-      doc.moveDown();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="sales-report.pdf"');
+        doc.pipe(res);
 
-      let isAlternate = false;
-      orderDetails.forEach((order) => {
-        const rowColor = isAlternate ? '#f9f9f9' : '#fff';
-        doc.rect(20, doc.y, 550, 30).fillAndStroke(rowColor, '#ddd');
+        doc.fontSize(20).font('Helvetica-Bold').text('Sales Report', { align: 'center' });
+
+        const summaryStartY = doc.y + 10;
+        doc.rect(40, summaryStartY, 200, 60).fill('#f2f2f2');
+        doc.fillColor('#000');
+        doc.fontSize(12).font('Helvetica-Bold').text('Sales Summary', 45, summaryStartY + 5, { underline: true });
+        doc.fontSize(11).font('Helvetica')
+            .text(`Total Orders: ${totalOrders}`, 45, summaryStartY + 25)
+            .text(`Total Sales: rs ${totalSales.toFixed(2)}`, 45, summaryStartY + 40)
+            .text(`Total Discount: rs ${totalDiscount.toFixed(2)}`, 45, summaryStartY + 55);
+
+        doc.fontSize(11)
+            .fillColor('#333')
+            .text(`Report Date: ${today.toDateString()}`, 400, summaryStartY + 5, { align: 'right' });
+
+        doc.moveDown(5);
+        
+        const headerTop = doc.y;
+        doc.rect(20, headerTop, 650, 25).fill('#000');
         doc
-        .font('Helvetica')
-          .fillColor('#000')
-          .fontSize(12)
-          .text(order.orderId.slice(0,15)+'...', 40, doc.y + 9, { width: 200 })
-          .text(order.orderDate.toLocaleDateString(), 185, doc.y - 12 , { width: 70 })
-          .text(order.itemsCount, 300, doc.y - 14, { width: 100 })
-          .text(order.customer, 405, doc.y - 14, { width: 100 })
-          .text(order.amount, 500, doc.y - 14, { width: 100 })
-        doc.moveDown();
-        isAlternate = !isAlternate;
-      });
-  
-      doc.rect(20, doc.y, 550, 90).fillAndStroke("f9f9f9", '#ddd');
+            .fillColor('#fff')
+            .font('Helvetica-Bold')
+            .fontSize(11)
+            .text('Order ID', 40, headerTop + 7, { width: 90 })
+            .text('Order Date', 130, headerTop + 7, { width: 80 })
+            .text('Items', 210, headerTop + 7, { width: 40 })
+            .text('Customer', 250, headerTop + 7, { width: 80 })
+            .text('Disc (%)', 360, headerTop + 7, { width: 60 })
+            .text('Tax (rs)', 420, headerTop + 7, { width: 50 })
+            .text('Amnt (rs)', 470, headerTop + 7, { width: 60 })
+            .text('Total (rs)', 530, headerTop + 7, { width: 60 });
 
-      doc
-        .fontSize(10)
-        .fillColor("#0000")
-        .text('Thank you for your business!', 50, doc.y + 15, { align: 'center', baseline: 'bottom' });
+        doc.fillColor('#000');
+        doc.moveDown(1.5);
 
-      doc.end();
+        let isAlternate = false;
+        const tableStartY = doc.y;
+
+        orderDetails.forEach(order => {
+            const rowColor = isAlternate ? '#f6f6f6' : '#ffffff';
+            const totalAmount = order.amount + order.tax ;
+            const rowTop = doc.y;
+
+            doc.rect(20, rowTop, 650, 30).fillAndStroke(rowColor, '#ddd');
+
+            doc.font('Helvetica').fillColor('#000').fontSize(11);
+            doc.text(order.orderId.slice(0, 15) + '...', 40, rowTop + 7, { width: 90 });
+            doc.text(order.orderDate.toLocaleDateString(), 130, rowTop + 7, { width: 80 });
+            doc.text(order.itemsCount, 210, rowTop + 7, { width: 40 });
+            doc.text(order.customer, 250, rowTop + 7, { width: 80 });
+            doc.text(order.discount.toFixed(2), 360, rowTop + 7, { width: 60 });
+            doc.text(order.tax.toFixed(2), 420, rowTop + 7, { width: 50 });
+            doc.text(order.amount.toFixed(2), 470, rowTop + 7, { width: 60 });
+            doc.text(totalAmount.toFixed(2), 530, rowTop + 7, { width: 60 });
+
+            doc.moveDown(1.5);
+            isAlternate = !isAlternate;
+        });
+        const totalHeight = (orderDetails.length * 30) + 25;
+        doc.rect(20, tableStartY - 2, 650, totalHeight).stroke('#aaa');
+
+        doc.end();
     } catch (error) {
-        console.log(error.message)
-      res.status(500).send('Error generating PDF');
+        console.log("PDF Report Error:", error.message);
+        res.status(500).send('Error generating PDF');
     }
-  };
+};
+
+
+
 
 
 const downloadExcel = async (req, res) => {
     try {
         let { day, startDate, endDate } = req.query;
-        let query = { status: { $in: ["Confirmed", "Delivered"] } };
+        let query = { 'payment.status': 'Paid' };
 
         const today = new Date();
         let fromDate = null;
-        let toDate = today;
+        let toDate = new Date();
 
         if (day === "salesToday") fromDate = new Date();
         else if (day === "salesWeekly") fromDate = new Date(today.setDate(today.getDate() - 7));
@@ -290,41 +308,66 @@ const downloadExcel = async (req, res) => {
             endDate = toDate.toISOString().split("T")[0];
         }
 
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        start.setUTCHours(0 - 5, 30, 0, 0);    
-         end.setUTCHours(23 - 5, 59 + 30, 59, 999); 
+        const start = new Date(startDate + "T00:00:00.000+05:30");
+        const end = new Date(endDate + "T23:59:59.999+05:30");
 
         query.createdOn = { $gte: start, $lte: end };
 
         const orders = await Order.find(query)
-            .populate("userId", "firstName email")
+            .populate("userId", "name email")
             .populate({ path: "orderedItems.product", model: "Product", select: "productName" })
             .sort({ createdOn: -1 })
             .lean();
 
-        if (orders.length === 0) return res.status(404).json({ message: "No orders found" });
+        if (orders.length === 0) {
+            return res.status(404).json({ message: "No orders found" });
+        }
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Sales Report");
 
+        // Add Summary Sheet
+        const summarySheet = workbook.addWorksheet("Summary");
+        const totalOrders = orders.length;
+        const totalSales = orders.reduce((acc, o) => acc + o.finalAmount, 0);
+        const totalDiscount = orders.reduce((acc, o) => acc + (o.discount || 0), 0);
+
+        summarySheet.columns = [
+            { header: "Summary", key: "label", width: 30 },
+            { header: "Value", key: "value", width: 30 }
+        ];
+
+        summarySheet.addRows([
+            { label: "Total Orders", value: totalOrders },
+            { label: "Total Sales (₹)", value: totalSales.toFixed(2) },
+            { label: "Total Discount (₹)", value: totalDiscount.toFixed(2) },
+            { label: "Report Date", value: today.toDateString() }
+        ]);
+
+        // Orders Sheet
         worksheet.columns = [
-            { header: "Order ID", key: "_id", width: 20 },
-            { header: "User", key: "user", width: 20 },
-            { header: "Total (₹)", key: "finalAmount", width: 15 },
+            { header: "Order ID", key: "orderId", width: 20 },
+            { header: "Customer", key: "user", width: 30 },
+            { header: "Order Date", key: "createdOn", width: 20 },
+            { header: "Items", key: "items", width: 40 },
             { header: "Discount (₹)", key: "discount", width: 15 },
-            { header: "Date", key: "createdOn", width: 20 },
-            { header: "Items", key: "items", width: 30 }
+            { header: "Tax (₹)", key: "tax", width: 15 },
+            { header: "Amount (₹)", key: "finalAmount", width: 15 },
+            { header: "Total (₹)", key: "total", width: 15 }
         ];
 
         orders.forEach(order => {
+            const tax = +(order.finalAmount * 0.10).toFixed(2);
+            const totalAmount = order.finalAmount + tax;
             worksheet.addRow({
-                _id: order._id,
-                user: `${order.userId?.firstName || "Unknown"} (${order.userId?.email || "N/A"})`,
-                finalAmount: order.finalAmount,
+                orderId: order.orderId || 'N/A',
+                user: `${order.userId?.name || "Unknown"}`,
+                createdOn: order.createdOn.toLocaleDateString(),
+                items: order.orderedItems.map(item => `${item.product?.productName || "Unknown"} x${item.quantity}`).join(", "),
                 discount: order.discount || 0,
-                createdOn: order.createdOn.toDateString(),
-                items: order.orderedItems.map(item => `${item.product?.productName || "Unknown"} x${item.quantity}`).join(", ")
+                tax,
+                finalAmount: order.finalAmount,
+                total: totalAmount.toFixed(2)
             });
         });
 
@@ -333,6 +376,7 @@ const downloadExcel = async (req, res) => {
         await workbook.xlsx.write(res);
         res.end();
     } catch (error) {
+        console.error("Excel Report Error:", error.message);
         res.status(500).json({ message: "Error generating Excel report" });
     }
 };

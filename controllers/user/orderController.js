@@ -32,7 +32,11 @@ const orderPlaced = async (req, res) => {
         console.log("User in request:", req.user);
         console.log("Session user:", req.session.user);
 
-        const { totalPrice, addressId, paymentMethod, discount = 0 } = req.body;
+        const { totalPrice, addressId, paymentMethod } = req.body;
+        let discount = 0
+        if(req.session.appliedCoupon !== null){
+            discount =  req.session.appliedCoupon.discount;
+        }
         const userId = req.user._id;
 
         const findUser = await User.findById(userId);
@@ -109,8 +113,11 @@ const orderPlaced = async (req, res) => {
                 phone: desiredAddress.phone,
                 altPhone: desiredAddress.altPhone
             },
-            paymentMethod,
-            status: "Pending"
+            payment: {
+        method: paymentMethod, 
+        status: paymentMethod === "cod" ? "Pending" : "Paid" 
+    },
+    status: "Pending"
         });
         
         await newOrder.save();
@@ -133,6 +140,9 @@ const createRazorpayOrder = async (req, res) => {
     try {
         const { userId, couponCode, taxAmount = 0 } = req.body;
 
+        console.log("sahil dataaaaaaaaaaaaaaaaaa",req.body.couponCode)
+        
+
         const user = await User.findById(userId).populate("cart.productId");
         if (!user) {
          
@@ -146,8 +156,10 @@ const createRazorpayOrder = async (req, res) => {
 
         let discount = 0;
         if (couponCode) {
-            const coupon = await Coupon.findOne({ code: couponCode });
+            const coupon = await Coupon.findOne({ name: couponCode.trim() }); // preshnam 
+            console.log("haaii",coupon)
             if (coupon) discount = coupon.offerPrice;
+            console.log(discount);
         }
         console.log("total discount is",discount)
 
@@ -230,7 +242,10 @@ const verifyRazorpayPayment = async (req, res) => {
         }
 
          const address = userAddress.address[0];
-         const discount = 0;
+        let discount = 0
+        if(req.session.appliedCoupon !== null){
+            discount =  req.session.appliedCoupon.discount;
+        }
          const finalAmount = totalPrice - discount;
          const orderId = await generateOrderId();
          const newOrder = new Order({
@@ -334,7 +349,7 @@ const createFailedOrder = async (req, res) => {
         if (!cart || cart.length === 0) {
             return res.status(400).json({ success:false,message: "Your cart is empty." });
         }
-
+  
         
         const outOfStockItems = [];
         for (const item of cart) {
@@ -643,7 +658,11 @@ const walletPayment = async (req, res) => {
     try {
         console.log("wallet working")
         const userId = req.session.user;
-        const { totalPrice, addressId, paymentMethod, discount = 0 } = req.body;
+        let discount = 0
+        if(req.session.appliedCoupon !== null){
+            discount =  req.session.appliedCoupon.discount;
+        }
+        const { totalPrice, addressId, paymentMethod} = req.body;
         console.log(req.body)
         if (!userId) {
             return res.status(401).json({ success: false, message: "Please log in" });

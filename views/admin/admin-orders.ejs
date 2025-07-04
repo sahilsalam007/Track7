@@ -224,7 +224,7 @@
             orders.forEach(order => {
                 const row = `
                     <tr>
-                        <td>#${order._id.toString().substring(18, 24)}</td>
+                        <td>#${order.orderId}</td>
                         <td>${order.user.name}</td>
                         <td>${new Date(order.createdOn).toLocaleDateString()}</td>
                         <td>₹${order.totalPrice.toFixed(2)}</td>
@@ -248,7 +248,7 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="/admin/order-details/${order._id}">
+                                        <a class="dropdown-item" href="/admin/order-details/${order.orderId}">
                                             <i class="fas fa-eye"></i> View Details
                                         </a>
                                     </li>

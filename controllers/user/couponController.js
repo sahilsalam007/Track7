@@ -36,6 +36,11 @@ const applyCoupon=async(req,res)=>{
         const finalPrice=cartTotal-discount;
         console.log("final apply:",finalPrice);
 
+        req.session.appliedCoupon={
+            couponCode:couponCode,
+            discount:discount
+        }
+        
         return res.json({
             success:true,
             couponName:couponCode,

@@ -6,12 +6,12 @@ const getorderDetails = async (req,res) => {
     try {
 
         const { orderId } = req.params;
-        const order = await Order.findById(orderId)
+        const order = await Order.findOne({ orderId })
             .populate('userId', 'name  email') 
             .populate({  
                 path:'orderedItems.product',select:'productName productImage price'
             }); 
-        if (!order) {
+        if (!order) { 
             return res.status(404).render('admin/error', { message: 'Order not found' });
         }
         res.status(200).render('admin-order-details', { order });        

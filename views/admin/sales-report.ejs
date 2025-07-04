@@ -202,7 +202,7 @@
                 <tr>
                     <td><%= i + 1 %></td>
                     <td><%= data[i].createdOn.toLocaleDateString('en-IN') %></td>
-                    <td><%= data[i]._id %></td>
+                    <td><%= data[i].orderId %></td>
                     <td><%= data[i].userId.name|| 'N/A' %></td>
                     <td class="text-uppercase"><%= data[i].payment?.method || 'N/A' %></td>
                     <td class="text-success fw-bold">₹<%= (data[i].finalAmount || 0).toLocaleString('en-IN') %></td>

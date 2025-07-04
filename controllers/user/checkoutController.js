@@ -36,6 +36,23 @@ const getCheckOut = async (req, res) => {
         }
 
         const blockedProducts = cart.filter(item => item.productId.isBlocked);
+        const unavailableItems = cart.filter(item => item.quantity > item.productId.quantity);
+        if (unavailableItems.length > 0) {
+    const unavailableNames = unavailableItems.map(item => item.productId.name).join(', ');
+    
+    return res.status(400).render('cart', { 
+        swal: {
+            title: 'Product Quantity Error',
+            text: `Some items in your cart exceed available stock: ${unavailableNames}. Please update your cart.`,
+            icon: 'error',
+            showConfirmButton: true
+        },
+        title: 'Cart',
+        user,
+        data: cart,
+        grandTotal: cart.reduce((sum, item) => sum + (item.productId.salesPrice * item.quantity), 0),
+    });
+}
         if (blockedProducts.length > 0) {
             const blockedProductNames = blockedProducts.map(item => item.productId.name).join(', ');
             user.cart = [];
