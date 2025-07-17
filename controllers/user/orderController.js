@@ -33,10 +33,12 @@ const orderPlaced = async (req, res) => {
         console.log("Session user:", req.session.user);
 
         const { totalPrice, addressId, paymentMethod } = req.body;
-        let discount = 0
-        if(req.session.appliedCoupon !== null){
+        const normalPaymentMethod = paymentMethod.toLowerCase();
+        let discount =0
+        if(req.session.appliedCoupon && typeof req.session.appliedCoupon.discount === 'number'){
             discount =  req.session.appliedCoupon.discount;
         }
+
         const userId = req.user._id;
 
         const findUser = await User.findById(userId);
@@ -89,7 +91,11 @@ const orderPlaced = async (req, res) => {
                 await product.save();
             }
         }
-        
+        console.log("Coupon Discount Stored in Session:", req.session.appliedCoupon);
+        const finalAmount= totalPrice - discount;
+        if(normalPaymentMethod === "cod" && finalAmount > 1000){
+            return res.status(400).json({success:false, message:"COD not allows orders above  rs 1000"})
+        }
 
         const orderId = await generateOrderId();
         const newOrder = new Order({
@@ -102,7 +108,7 @@ const orderPlaced = async (req, res) => {
             })),
             totalPrice,
             discount,
-            finalAmount: totalPrice - discount,
+            finalAmount,
             address: {
                 addressType: desiredAddress.addressType,
                 name: desiredAddress.name,
@@ -114,8 +120,8 @@ const orderPlaced = async (req, res) => {
                 altPhone: desiredAddress.altPhone
             },
             payment: {
-        method: paymentMethod, 
-        status: paymentMethod === "cod" ? "Pending" : "Paid" 
+        method: normalPaymentMethod, 
+        status: normalPaymentMethod === "cod" ? "Pending" : "Paid" 
     },
     status: "Pending"
         });
@@ -243,7 +249,7 @@ const verifyRazorpayPayment = async (req, res) => {
 
          const address = userAddress.address[0];
         let discount = 0
-        if(req.session.appliedCoupon !== null){
+        if(req.session.appliedCoupon && typeof req.session.appliedCoupon.discount === "number"){
             discount =  req.session.appliedCoupon.discount;
         }
          const finalAmount = totalPrice - discount;
@@ -659,7 +665,7 @@ const walletPayment = async (req, res) => {
         console.log("wallet working")
         const userId = req.session.user;
         let discount = 0
-        if(req.session.appliedCoupon !== null){
+        if(req.session.appliedCoupon && typeof req.session.appliedCoupon.discount === 'number'){
             discount =  req.session.appliedCoupon.discount;
         }
         const { totalPrice, addressId, paymentMethod} = req.body;
@@ -802,7 +808,54 @@ const getOrderDetails = async (req,res) => {
         res.status(500).redirect('/pageNotFound');
     }
 }
-             
+  
+
+const returnOrder = async (req, res) => {
+    const { orderId, itemId } = req.params;
+    const { returnReason } = req.body;
+
+    try {
+        console.log('Received orderId:', orderId, 'itemId:', itemId);
+        const order = await Order.findOne({ orderId: orderId.trim() });
+        if (!order) {
+            console.log('Orders in DB:', await Order.find({}, { orderId: 1, _id: 1 }));
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        const item = order.orderedItems.id(itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found in order' });
+        }
+
+        if (item.productStatus !== 'Delivered') {
+            return res.status(400).json({ success: false, message: 'Only delivered orders can be returned' });
+        }
+
+        if (item.productStatus === 'Returned' || item.productStatus === 'Return Request') {
+            return res.status(400).json({ success: false, message: 'Item already requested for return or returned' });
+        }
+
+        // Update item status and reason
+        item.productStatus = 'Return Request';
+        item.returnReason = returnReason;
+
+        // Update order status to return-requested only if necessary
+        if (order.orderedItems.some(item => item.productStatus === 'Return Request')) {
+            order.status = 'return-requested';
+        }
+
+        await order.save();
+
+        console.log(`Product [${itemId}] from Order [${order.orderId}] marked as Return Request`);
+
+        return res.status(200).json({ success: true, message: 'Return request submitted successfully' });
+    } catch (error) {
+        console.error('Return order error:', error);
+        return res.status(500).json({ success: false, message: 'Error processing return request' });
+    }
+};
+
+
 
 module.exports = {
     orderPlaced,
@@ -816,5 +869,6 @@ module.exports = {
     getFailedOrders,
     createRazorpayOrder,
     verifyRazorpayPayment,
-    walletPayment
+    walletPayment,
+    returnOrder
 }

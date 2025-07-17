@@ -1,234 +1,183 @@
 <!DOCTYPE html>
-<html lang="zxx">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Male_Fashion Template" />
-    <meta name="keywords" content="Male_Fashion, unica, creative, html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Track7</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css" />
-    <link rel="stylesheet" href="css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      body,
-      html {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-      }
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-      }
-      .card {
-  width: 100%;
-  max-width: 400px;
-  background-color: #ffffff;
-  color: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgb(0, 0, 0);
-  padding: 30px; 
-}
-      .login-section {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-      }
-      .login-form,
-      .login-image {
-        flex: 1;
-        padding: 10px;
-      }
-      .login-form {
-        max-width: 50%;
-      }
-      .login-image {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        max-width: 40%;
-      }
-      .login-image img {
-        max-width: 100%;
-        height: auto;
-      }
-      .social-btns {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 10px;
-      }
-      .social-btns button {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-      }
-      .form-group {
-  margin-bottom: 15px; /* Adds space between each field */
-}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track7</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-.form-group label {
-  font-size: 0.875rem; /* Decrease label size */
-}
+         body, html {
+       height: 100%;
+       margin: 0;
+       font-family: 'Nunito', sans-serif;
+       background: 
+         linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+         url('/img/hero/home15.jpg') no-repeat center center fixed;
+       background-size: cover;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+     }
 
-.form-control {
-  font-size: 0.875rem; /* Decrease input text size */
-  padding: 0.5rem; /* Decrease padding */
-  
-}
+    .login-wrapper {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+      color: white;
+    }
 
+    .login-wrapper h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
 
-      .card-title {
-        font-size: 1.25rem; /* Decrease card title size */
-      }
-      .login-image .sign-up-link {
-        color: #333;
-        text-decoration: none;
-      }
-      .login-image .sign-up-link:hover {
-        color: #ff7f50;
-      }
-      .error-message {
-        color: red !important;
-        font-size: 0.75rem;
-        display: none;
-      }
-      .btn-primary {
-    background-color: black !important;
-    border: none !important;
-    color: white !important;
-    border-radius: 8px;
-    padding: 0.75rem 1rem; /* Adjust padding slightly */
-    font-size: 0.875rem;
-    width: 100%; /* Make the button full width */
-    max-width: 300px; /* Set a max width if needed */
-    display: block;
-    margin: auto;
-}
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="card">
-        <div class="card-body login-section">
-          <div class="login-form mt-5">
-            <h6 class="card-title text-center" style="color:black"> Admin Login</h6>
-            <form id="loginform" method="post" action="/admin/login">
-              <div class="form-group mt-3px" style="color:black">
-                <label for="email">Email address</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  name="email"
-                  id="email"
-                  placeholder="Enter email"
-                />
-                <div id="error1" class="error-message"></div>
-              </div>
-              <div class="form-group" style="color:black">
-                <label for="password">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  name="password"
-                  id="password"
-                  placeholder="Password"
-                />
-                <div id="error2" class="error-message"></div>
-              </div>
-              <%if(locals.message && message.length>0){%>
-              <div class="alert alert-danger text-center">
-                <%=message%>
-              </div>
-              <%}%>
-              <div class="d-flex justify-content-between align-items-center">
-                <button type="submit" class="btn btn-primary">Log In</button>
-               
-               
-              </div>
-              
-            </form>
-          </div>
-          <div class="login-image">
-            <a href="/">
-              <img src="/img/homelogin1.jpg" alt="Shopping Site" />
-            </a>
-          </div>
-        </div>
+    .form-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 50px 14px 45px;
+      border: none;
+      border-radius: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-group i {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    .form-group i.left-icon {
+      left: 15px;
+    }
+
+    .form-group i.right-icon {
+      right: 15px;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border-radius: 30px;
+      background-color: white;
+      color: #0f2027;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-submit:hover {
+      background-color: #ddd;
+    }
+
+    .error-message {
+      font-size: 0.8rem;
+      color: #ff4d4d;
+      padding-left: 10px;
+      margin-top: -15px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .alert-danger {
+      color: #ff4d4d;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrapper">
+    <h2>LOGIN</h2>
+    <form id="loginform" method="post" action="/admin/login">
+      <div class="form-group">
+        <i class="fas fa-user left-icon"></i>
+        <input type="email" name="email" id="email" placeholder="Username" />
+        <div id="error1" class="error-message"></div>
       </div>
-    </div>
+      <div class="form-group">
+        <i class="fas fa-lock left-icon"></i>
+        <input type="password" name="password" id="password" placeholder="Password" />
+        <div id="error2" class="error-message"></div>
+      </div>
 
-    <script>
-      const emailid = document.getElementById("email");
-      const passid = document.getElementById("password");
-      const error1 = document.getElementById("error1");
-      const error2 = document.getElementById("error2");
-      const loginform = document.getElementById("loginform");
+      <% if (locals.message && message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+      <% } %>
 
-      function emailValidateChecking(e) {
-        const emailval = emailid.value;
-        const emailpattern =
-          /^[a-zA-Z0-9._-]+@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
+      <button type="submit" class="btn-submit">LOGIN</button>
+    </form>
+  </div>
 
-        if (!emailpattern.test(emailval)) {
-          error1.style.display = "block";
-          error1.innerHTML = "Invalid Format";
-        } else {
-          error1.style.display = "none";
-          error1.innerHTML = "";
-        }
+  <script>
+    const emailid = document.getElementById("email");
+    const passid = document.getElementById("password");
+    const error1 = document.getElementById("error1");
+    const error2 = document.getElementById("error2");
+    const loginform = document.getElementById("loginform");
+
+    function emailValidateChecking() {
+      const emailval = emailid.value;
+      const emailpattern = /^[a-zA-Z0-9._-]+@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
+
+      if (!emailpattern.test(emailval)) {
+        error1.style.display = "block";
+        error1.innerHTML = "Invalid Format";
+      } else {
+        error1.style.display = "none";
+        error1.innerHTML = "";
       }
+    }
 
-      function passValidateChecking(e) {
-        const passval = passid.value;
-        if (passval.length < 8) {
-          error2.style.display = "block";
-          error2.innerHTML = "Should contain at least 8 characters";
-        } else {
-          error2.style.display = "none";
-          error2.innerHTML = "";
-        }
+    function passValidateChecking() {
+      const passval = passid.value;
+      if (passval.length < 8) {
+        error2.style.display = "block";
+        error2.innerHTML = "Should contain at least 8 characters";
+      } else {
+        error2.style.display = "none";
+        error2.innerHTML = "";
       }
+    }
 
-      document.addEventListener("DOMContentLoaded", function () {
-        loginform.addEventListener("submit", function (e) {
-          emailValidateChecking();
-          passValidateChecking();
+    document.addEventListener("DOMContentLoaded", function () {
+      loginform.addEventListener("submit", function (e) {
+        emailValidateChecking();
+        passValidateChecking();
 
-          if (!emailid || !passid || !error1 || !error2 || !loginform) {
-            console.error("One or more elements not found");
-          }
+        if (!emailid || !passid || !error1 || !error2 || !loginform) {
+          console.error("One or more elements not found");
+        }
 
-          if (error1.innerHTML || error2.innerHTML) {
-            e.preventDefault();
-          }
-        });
+        if (error1.innerHTML || error2.innerHTML) {
+          e.preventDefault();
+        }
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
-

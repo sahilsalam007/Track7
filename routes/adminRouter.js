@@ -19,7 +19,6 @@ const salesController=require("../controllers/admin/salesController");
 router.get("/pageerror",adminController.pageerror);
 router.get("/login",adminController.loadLogin);
 router.post("/login",adminController.login);
-router.get("/",isSessionAdmin,adminAuth,adminController.loadDashboard);
 router.get("/logout",adminController.logout);
 
 
@@ -65,6 +64,7 @@ router.get('/orders',isSessionAdmin,adminAuth,orderController.getorder);
 router.get('/api/orders', isSessionAdmin,adminAuth, orderController.getOrderList);
 router.get('/order-details/:orderId',isSessionAdmin, adminAuth,orderController.getorderDetails);
 router.post('/update-order-status',isSessionAdmin,adminAuth,orderController.updateStatus);
+router.post("/approve-item-return",orderController.approveItemReturn)
 
 
  //coupon Management
@@ -75,14 +75,18 @@ router.post("/updateCoupon",adminAuth,couponController.updateCoupon);
 router.get("/deleteCoupon",adminAuth,couponController.deleteCoupon);
 
 // wallet management
-// router.get("/wallet",adminAuth,walletController.getWallet);
-// router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
+router.get("/wallet",adminAuth,walletController.getWallet);
+router.get("/wallet-details",adminAuth,walletController.getWalletDetails);
 
 //sales report management
 router.get("/sales-report",isSessionAdmin,adminAuth,salesController.getSalesReport);
 //pdf
 router.get("/download-pdf",isSessionAdmin,adminAuth,salesController.downloadPDF);
 router.get("/download-excel",isSessionAdmin,adminAuth,salesController.downloadExcel);
+
+//dasboard management
+router.get("/",isSessionAdmin,adminAuth , adminController.loadDashboard);
+router.get("/dashboard",isSessionAdmin,adminController.loadDashboard)
 
 
 

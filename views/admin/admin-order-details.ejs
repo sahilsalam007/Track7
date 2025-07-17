@@ -1,17 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
             --success-color: #4cc9f0;
             --warning-color: #ffd60a;
-            --danger-color:  #ee1212;
+            --danger-color: #ee1212;
             --light-bg: #f8f9fa;
             --text-dark: #2b2d42;
             --text-light: #edf2f4;
@@ -64,6 +64,8 @@
         .pending { background-color: var(--warning-color); }
         .delivered { background-color: var(--success-color); color: white; }
         .cancelled { background-color: var(--danger-color); color: white; }
+        .return-request { background-color: #f8d7da; color: #721c24; }
+        .returned { background-color: #f8d7da; color: #721c24; }
 
         table {
             width: 100%;
@@ -106,10 +108,18 @@
             cursor: pointer;
         }
 
+        .btn-success {
+            background-color: #28a745;
+        }
+
         .btn:hover {
             background-color: var(--secondary-color);
             transform: translateY(-2px);
             box-shadow: var(--card-shadow);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
         }
 
         .price-summary p {
@@ -175,15 +185,27 @@
                         <th>Product</th>
                         <th>Quantity</th>
                         <th>Price</th>
+                        <th>Status</th>
+                        <th>Return Reason</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% order.orderedItems.forEach(item => { %>
                         <tr>
-                            <td><img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="Product Image" class="product-img"></td>
-                            <td><%= item.product.productName%></td>
+                            <td><img src="/Uploads/re-image/<%= item.product.productImage[0] %>" alt="Product Image" class="product-img"></td>
+                            <td><%= item.product.productName %></td>
                             <td><%= item.quantity %></td>
                             <td>₹<%= item.price.toFixed(2) %></td>
+                            <td><span class="status <%= item.productStatus.toLowerCase() %>"><%= item.productStatus %></span></td>
+                            <td><%= item.returnReason || '-' %></td>
+                            <td>
+                                <% if (item.productStatus === 'Return Request') { %>
+                                    <form class="approve-return-form" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>">
+                                        <button type="submit" class="btn btn-success">✅ Approve Return & Refund</button>
+                                    </form>
+                                <% } %>
+                            </td>
                         </tr>
                     <% }) %>
                 </tbody>
@@ -195,10 +217,55 @@
             <p><strong>Total Price:</strong> <span>₹<%= order.totalPrice.toFixed(2) %></span></p>
             <p><strong>Discount:</strong> <span>₹<%= order.discount.toFixed(2) %></span></p>
             <p><strong>Final Amount:</strong> <span>₹<%= order.finalAmount.toFixed(2) %></span></p>
-            <p><strong>Payment Method:</strong> <span><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Razorpay' %></span></p>
+            <p><strong>Payment Method:</strong> <span><%= order.payment.method %></span></p>
         </div>
 
         <a href="/admin/orders" class="btn" style="background-color: #000000; color: rgb(255, 255, 255);">Back to Orders</a>
     </div>
+
+    <script>
+        document.querySelectorAll('.approve-return-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = form.dataset.orderId;
+                const itemId = form.dataset.itemId;
+
+                try {
+                    const response = await fetch('/admin/approve-item-return', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId, itemId })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Item return approved successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to approve return.',
+                            icon: 'error',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error approving return:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Something went wrong. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

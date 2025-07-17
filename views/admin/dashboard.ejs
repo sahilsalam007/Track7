@@ -1,11 +1,259 @@
 <%- include("../../views/partials/admin/header") %>
-<section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Dashboard </h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+       .card { 
+    border: none; 
+    border-radius: 15px; 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 1.5rem;
+    background-color: #ffffff;
+}
+.card:hover { 
+    transform: translateY(-6px); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+}
+
+/* Sales Card (red-pink gradient) */
+.sales-card { 
+    background: linear-gradient(135deg, #ff6a6a, #ff1f5a); 
+    color: white; 
+}
+
+/* Stats / Filter Card (purple-blue gradient) */
+.stats-card { 
+    background: linear-gradient(135deg, #6a11cb, #2575fc); 
+    color: white; 
+}
+
+.chart-container { 
+    height: 320px; 
+}
+
+.list-group-item { 
+    border: none; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.form-select {
+    background-color: #ffffff;
+    color: #333;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 0 10px rgba(0,0,0,0.08);
+}
+
+.form-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #6a11cb44;
+}
+
+.badge-sales, 
+.badge.bg-primary {
+    background-color: #2575fc;
+}
+
+.badge.bg-success {
+    background-color: #28a745;
+}
+
+.product-thumb { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 8px; 
+    object-fit: cover; 
+}
+
+.section-title { 
+    font-size: 1.3rem; 
+    font-weight: 600; 
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.stats-icon { 
+    font-size: 2rem; 
+    opacity: 0.8; 
+    color: white;
+}
+
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+            <!-- <button class="btn btn-primary"><i class="fas fa-book me-2"></i>Generate Report</button> -->
         </div>
-       
+
+        <!-- Top Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card sales-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-wallet me-2 text-white"></i>Total Sales</h5>
+                        <h2 class="mb-0">Rs. <%= totalSales %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-filter me-2 text-white"></i>Filter</h5>
+                        <select id="filter" class="form-select  text-black" onchange="updateChart()">
+                            <option value="yearly">Yearly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Chart -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-bar me-2"></i>Sales Overview</h5>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Sections -->
+        <div class="row g-4">
+            <!-- Best Selling Products -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title section-title"><i class="fas fa-star me-2"></i>Best Selling Products</h5>
+                        <% bestSellingProducts.forEach((product, index) => { %>
+                            <div class="list-group-item">
+                                <span class="badge bg-primary me-2"><%= index + 1 %></span>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1"><%= product.productDetails.productName %></h6>
+                                    <small class="text-muted"><%= product.productDetails.brand %></small>
+                                </div>
+                                <span class="badge bg-success"><%= product.totalSold %> sold</span>
+                            </div>
+                        <% }) %>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories and Brands -->
+            <div class="col-lg-6">
+                <!-- Categories -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title section-title"><i class="fas fa-tags me-2"></i>Top Categories</h5>
+                        <% bestSellingCategories.forEach(category => { %>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <%= category.categoryName %>
+                                <span class="badge bg-primary rounded-pill"><%= category.totalSold %></span>
+                            </li>
+                        <% }) %>
+                        
+                    </div>
+                </div>
+
+                <!-- Brands -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title section-title"><i class="fas fa-copyright me-2"></i>Top Brands</h5>
+                        <div class="list-group">
+                            <!-- Repeat this block for top 10 brands -->
+                            <% bestSellingBrands.forEach(brand => { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <%= brand._id %>
+                                    <span class="badge bg-primary rounded-pill"><%= brand.totalSold %></span>
+                                </li>
+                            <% }) %>
+                            
+                            <!-- Add 9 more brand items -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+
+    <script> 
+
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [], // Empty initially
+        datasets: [{
+            label: 'Sales Data',
+            data: [],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: { responsive: true }
+});
+
+
+
+
+
+function updateChart() {
+    const filter = document.getElementById('filter').value;
+    
+    let salesData;
+
+    if (filter === "yearly") {
+        salesData = JSON.parse(`<%- JSON.stringify(yearlySales || []) %>`);  
+    } else if (filter === "monthly") {
+        salesData = JSON.parse(`<%- JSON.stringify(monthlySales || []) %>`);
+    } else if (filter === "weekly") {
+        salesData = JSON.parse(`<%- JSON.stringify(weeklySales || []) %>`);
+    }
+
+    const labels = salesData.map(item => {
+        if (filter === "yearly") {
+            // Convert month number to month name
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return monthNames[item._id - 1]; // _id is month number (1-12)
+        } else if (filter === "monthly") {
+            return `Day ${item._id}`;
+        } else if (filter === "weekly") {
+            const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            return weekDays[item._id - 1]; // _id is day of week (1 = Sunday, 7 = Saturday)
+        }
+        return item._id;
+    });
+
+    const data = salesData.map(item => item.total);
+
+    salesChart.data.labels = labels;
+    salesChart.data.datasets[0].data = data;
+    salesChart.update();
+}
+
+
+    </script>
+</body>
+</html>
 <%- include("../../views/partials/admin/footer") %>
-   

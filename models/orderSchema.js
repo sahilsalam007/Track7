@@ -29,8 +29,12 @@ const orderSchema=new Schema({
      },
      productStatus:{
         type:String,
-        enum:['Confirmed','Processing','Shipped','Delivered','Cancelled','Return-Request','Returned','Pending'],
+        enum:['Confirmed','Processing','Shipped','Delivered','Cancelled','Return Request','Returned','Pending'],
         default:'Confirmed'
+    },
+     returnReason: {
+        type: String,
+        default: null
     }
     }],
     totalPrice:{
@@ -89,6 +93,9 @@ const orderSchema=new Schema({
         enum: ["Pending", "confirmed", "Processing", "Shipped", "Delivered", "Cancelled", "return-requested", "returned","Failed"],
         default: "pending"
     },
+    returnReason: {
+    type: String
+}
 })
 const Order=mongoose.model("Order",orderSchema);
 module.exports=Order;

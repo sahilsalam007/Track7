@@ -287,8 +287,6 @@ const downloadPDF = async (req, res, next) => {
 
 
 
-
-
 const downloadExcel = async (req, res) => {
     try {
         let { day, startDate, endDate } = req.query;

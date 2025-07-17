@@ -573,11 +573,12 @@ async function placeOrder(userId) {
                 }).then(() => {
                     window.location.href = "/order-success";
                 });
-            } else {
+            }
+             else {
                 Swal.fire({
                     icon: "error",
                     title: "Order Failed",
-                    text: result.error || "Failed to place order.",
+                    text: result.error || "Failed to place order ,COD not allows orders above  rs 1000",
                     confirmButtonColor: "#d33"
                 });
             }

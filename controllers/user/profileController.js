@@ -161,7 +161,7 @@ const userProfile=async (req,res)=>{
         const userData=await User.findById(userId);
         const addressData=await Address.findOne({userId:userId});
         const wallet=await Wallet.findOne({userId}) || {balance:0,transactions:[]};
-        wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        wallet.transactions.sort((a,b)=>new Date(b.createdAt) - new Date(a.createdAt));
         res.render("profile",{
             user:userData,
             userAddress:addressData,

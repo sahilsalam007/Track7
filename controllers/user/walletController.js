@@ -21,9 +21,6 @@ const getWallet = async (req, res) => {
         }
 
 
-       
-        // console.log(new Date(a.createdAt), new Date(b.createdAt)); 
-
 
         res.render("wallet", { wallet });
     } catch (error) {

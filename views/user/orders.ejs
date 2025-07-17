@@ -131,6 +131,32 @@
         .header_nav_option{
             display: none;
         }
+        .status-returned {
+            background: #f8d7da; 
+            color: #721c24;
+        }
+        .item-status {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .styled-return-btn {
+    background-color: rgb(0, 0, 0);
+    color: #FFD700;
+    border: 2px solid #FFD700;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.styled-return-btn:hover {
+    background-color: #FFD700;
+    color: white;
+}
+
     </style>
   
 </head>
@@ -160,54 +186,62 @@
     <%= (order.orderedItems.every(item=>item.productStatus==='Cancelled')) ? 'Cancelled' : order.status %>
 </div>
 
-                    </div>
+                               </div>
+           <% order.orderedItems.forEach(item => { %>
+    <div class="order-item">
+        <img src="/Uploads/re-image/<%= item.product.productImage[0] %>" alt="<%= item.product.name %>">
+        <div class="order-details">
+            <h4><%= item.product.productName %></h4>
+            <p>Price: ₹<%= item.price %></p>
+            <p>Quantity: <%= item.quantity %></p>
+            <p>Payment Status: <%= order.payment.status %></p>
+            <p>Status: 
+                <span class="item-status 
+                    <% if (item.productStatus === 'Cancelled') { %>status-cancelled
+                    <% } else if (item.productStatus === 'Returned') { %>status-returned
+                    <% } else if (item.productStatus === 'Delivered') { %>status-delivered
+                    <% } else if (item.productStatus === 'Shipped') { %>status-shipped
+                    <% } else { %>status-pending<% } %>">
+                    <%= item.productStatus %>
+                </span>
+            </p>
+            <% if (item.size) { %><p>Size: <%= item.size %></p><% } %>
 
-                    <% order.orderedItems.forEach(item => { %>
-                        <div class="order-item">
-                            <img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="<%= item.product.name %>">
-                            <div class="order-details">
-                                <h4><%= item.product.productName %></h4>
-                                <p>Price: ₹<%= item.price %></p>
-                                <p>Quantity: <%= item.quantity %></p>
-                                <p>payment status: <%= order.payment.status %></p>
-                                <% if (item.size) { %><p>Size: <%= item.size %></p><% } %>
-                                
-                                    <% if (order.status !== 'Delivered' && item.productStatus !=='Cancelled') { %>
-                                        <button type="button" class="cancell-btn" onclick="confirmCancel('<%= order.orderId %>', '<%= item._id %>')">
-                                            Cancel Item
-                                        </button>
-                                    <% } %>
-                                   
-                            </div>
-                        </div>
-                    <% }); %>
+            <% if (order.status !== 'Delivered' && order.status !== 'return-requested' && item.productStatus !== 'Cancelled' && order.status !== 'returned') { %>
+                <button type="button" class="cancell-btn" onclick="confirmCancel('<%= order.orderId %>', '<%= item._id %>')">
+                    Cancel Item
+                </button>
+            <% } %>
 
-                    <div class="price-details">
-                        <div class="detail-item">
-                            <span>Total Price:</span>
-                            <span>₹<%=order.totalPrice %></span>
-                        </div>
-                        <div class="detail-item">
-                            <span>Discount:</span>
-                            <span>- ₹<%= order.discount %></span>
-                        </div>
-                        <div class="detail-item total-price">
-                            <span>Final Amount:</span>
-                            <span>₹<%= order.finalAmount + (order.finalAmount * 0.1) %></span>
-
-                            <span></span>
-                        </div>
-                    </div>
-                    <form id="returnForm-<%= order.orderId %>" action="/return-order/<%= order.orderId %>" method="post">
-                        <input type="hidden" name="returnReason" id="returnReason-<%= order.orderId %>">
-                        <% if (order.status === 'Delivered') { %>
-                            <button type="button" class="return-btn" onclick="askReturnReason('<%= order.orderId %>')">Return Order</button>
-                        <% } %>
-                    </form>               
-
-                    <a class="btn" href="/order-details/<%= order._id %>">
-                        View Details
-                    </a>
+            <% if (item.productStatus === 'Delivered') { %>
+                <form id="returnForm-<%= item._id %>" action="/return-order/<%= order.orderId %>/<%= item._id %>" method="post">
+    <input type="hidden" name="returnReason" id="returnReason-<%= item._id %>">
+    <button type="button" class="return-btn styled-return-btn" onclick="askReturnReason('<%= order.orderId %>','<%= item._id %>')">Return Item</button>
+</form>
+            <% } %>
+        </div>
+    </div>
+<% }); %>
+                               
+           <div class="price-details">
+               <div class="detail-item">
+                   <span>Total Price:</span>
+                   <span>₹<%= order.totalPrice %></span>
+               </div>
+               <div class="detail-item">
+                   <span>Discount:</span>
+                   <span>- ₹<%= order.discount %></span>
+               </div>
+               <div class="detail-item total-price">
+                   <span>Final Amount:</span>
+                   <span>₹<%= order.finalAmount + (order.finalAmount * 0.1) + (order.discount * 0.1) %></span>
+               </div>
+           </div>
+           
+           <a class="btn" href="/order-details/<%= order._id %>">
+               View Details
+           </a>
+           
                 </div>
             <% }); %>
         <% } %>
@@ -288,27 +322,62 @@
     
     
     
-        function askReturnReason(orderId) {
-        Swal.fire({
-            title: "Return Order",
-            input: "text",
-            inputLabel: "Please enter a reason for return",
-            inputPlaceholder: "E.g., Wrong size, Defective product, etc.",
-            showCancelButton: true,
-            confirmButtonText: "Submit",
-            cancelButtonText: "Cancel",
-            inputValidator: (value) => {
-                if (!value) {
-                    return "You need to provide a reason!";
+    function askReturnReason(orderId,itemId) {
+    Swal.fire({
+        title: "Return Order",
+        input: "text",
+        inputLabel: "Please enter a reason for return",
+        inputPlaceholder: "E.g., Wrong size, Defective product, etc.",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Cancel",
+        inputValidator: (value) => {
+            if (!value) {
+                return "You need to provide a reason!";
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            console.log('Frontend: Extracted orderId:', orderId, 'itemId:', itemId);
+            fetch(`/return-order/${orderId}/${itemId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ returnReason: result.value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: "Returned!",
+                        text: "Your item has been returned successfully.",
+                        icon: "success",
+                        confirmButtonColor: "#3085d6"
+                    }).then(() => {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: data.message || "Something went wrong.",
+                        icon: "error",
+                        confirmButtonColor: "#d33"
+                    });
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) { 
-                document.getElementById(`returnReason-${orderId}`).value = result.value;
-                document.getElementById(`returnForm-${orderId}`).submit();
-            }
-        });
-    }
-    
+            })
+            .catch(error => {
+                console.error("Return Error:", error);
+                Swal.fire({
+                    title: "Error!",
+                    text: "Something went wrong. Please try again.",
+                    icon: "error",
+                    confirmButtonColor: "#d33"
+                });
+            });
+        }
+    });
+}
     </script>
 <%- include("../../views/partials/user/footer") %>

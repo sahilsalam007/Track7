@@ -93,6 +93,7 @@ router.get('/orders',userAuth,session,orderController.viewOrders)
 router.post('/cancel-order',userAuth,orderController.cancelOrder)
 router.get('/order-details/:orderId',userAuth,orderController.getOrderDetails)
 router.get('/download-invoice/:orderId',userAuth,orderController.downloadInvoice)
+router.post('/return-order/:orderId/:itemId',userAuth,orderController.returnOrder)
 
 //retry payment
 router.get("/order-failed",userAuth,orderController.loadOrderFailed);

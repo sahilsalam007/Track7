@@ -65,11 +65,11 @@ const session = async (req, res, next) => {
 
             if (!user || user.isBlocked) {
                 req.session.destroy(() => {
-                    res.locals.user = null; // 🧹 Don't pass any user to views
+                    res.locals.user = null; 
                     return res.redirect('/');
                 });
             } else {
-                res.locals.user = user; // ✅ only if user is valid & not blocked
+                res.locals.user = user; 
                 next();
             }
         } else {

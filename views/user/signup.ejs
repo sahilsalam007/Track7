@@ -23,209 +23,191 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
-    <style>
-      .header_nav_option .sign-in-link {
-        font-size: 16px;
-        color: #221e1e;
-        margin-right: 15px;
-        text-decoration: none;
-        font-weight: 600;
-      }
-      .header_nav_option .sign-in-link:hover {
-        color: #ff7f50;
-      }
-      .signup-section {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-      }
-      .signup-form,
-      .signup-image {
-        flex: 1;
-        padding: 10px;
-      }
-      .signup-form {
-        max-width: 50%;
-      }
-      .signup-image {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        max-width: 40%;
-      }
-      .signup-image img {
-        max-width: 100%;
-        height: auto;
-      }
-      .social-btns {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 10px;
-      }
-      .social-btns button {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-      }
-      .spacer {
-        height: 30px; /* Adjust the height as needed */
-      }
+<style>
+  body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-image: url('/img/hero/home14.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-      .card {
-    background-color: rgb(0, 0, 0);
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+  .card {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 30px 40px;
+    /* background: linear-gradient(to right, rgba(5, 57, 66, 0.9), rgba(4, 28, 44, 0.95)); */
+     background: rgba(4, 28, 44, 0.75); /* previously 0.9 or 0.95 */
+  backdrop-filter: blur(4px);
     color: white;
-    border: 1px solid white;
-    border-radius: 50px; /* Adjust as needed */
-    padding: 20px;
-    
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+  }
+
+  .card-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .form-control::placeholder {
+    color: #cccccc;
+  }
+
+  .form-group label {
+    display: none;
+  }
+
+  .btn-primary {
+    background-color: white !important;
+    color: #022c3f !important;
+    font-weight: bold;
+    padding: 10px 0;
+    width: 100%;
+    border-radius: 30px;
+    border: none;
+  }
+
+  .google-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff; /* soft lavender background */
+  border-radius:  50px;
+  padding: 10px 20px;
+  text-decoration: none;
+  width: 400px;
+  gap: 10px;
+  margin-left: 8px;
+  transition: 0.3s;
+  color: #000;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.google-auth-btn img {
+  width: 50px;
+  height: 30px;
+}
+
+.google-auth-btn:hover {
+  background-color: #c6c3ee;
+  transform: translateY(-2px);
+}
+
    
 
+  .signup-image {
+    text-align: center;
+    margin-top: 15px;
   }
-      .form-group label {
-        font-size: 0.875rem; /* Decrease label size */
-        color:white;
-      }
-      .form-control {
-        font-size: 0.875rem; /* Decrease input text size */
-        padding: 0.5rem; /* Decrease padding */
-      }
-      .btn-primary {
-        padding: 0.5rem 1rem; /* Decrease button padding */
-        font-size: 0.875rem; /* Decrease button text size */
-      }
-      .card-title {
-        font-size: 1.25rem; /* Decrease card title size */
-      }
-      .signup-image .sign-in-link {
-        color: #333;
-        text-decoration: none;
-      }
-      .signup-image .sign-in-link:hover {
-        color: #ff7f50;
-      }
-      .error-message{
-        color: red;
-        font-size: 0.75rem;
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container mt-5 mb-1">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card">
-            <div class="card-body signup-section">
-              <div class="signup-form">
-                <h3 class="card-title text-center" style="color:white; font-size: 28px; font-weight: bold;">Sign Up</h3>
 
+  .signup-image a {
+    color: white;
+    font-size: 0.9rem;
+    text-decoration: underline;
+  }
 
-                <form id="signform" method="post" action="/signup">
-                  <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="name"
-                      name="name"
-                      placeholder="Enter Name"
-                    />
-                    <div id="error1" class="error-message"></div>
-                  </div>
-                  <div class="form-group">
-                    <label for="email">Email address</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="email"
-                      name="email"
-                      placeholder="Enter email"
-                    />
-                    <div id="error2" class="error-message"></div>
-                  </div>
-                  <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="phone"
-                      name="phone"
-                      placeholder="Enter phone number"
-                    />
-                    <div id="error3" class="error-message"></div>
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      name="password"
-                      placeholder="Password"
-                    />
-                    <div id="error4" class="error-message"></div>
-                  </div>
-                  <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="confirm-password"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                    />
-                    <div id="error5" class="error-message"></div>
-                  </div>
-                  <%if(locals.message && message.length>0){%>
-                    <div class="alert alert-danger text-center">
-                      <%=message%>
-                    </div>
-                    <%}%>
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <button type="submit" class="btn btn-primary">
-                      Sign Up
-                    </button>
-                    <!-- <div class="mt-2px" >
-                      <p>or sign up with</p>
-                    </div> -->
-                    <div class="social-btns">
-                      <a href="/auth/google" class="btn btn-outline-danger">
-                        <img
-                          src="img/Google-Symbol.jpg"
-                          alt="Google Logo"
-                          style="width: 24px; height: 24px"
-                        />
-                      </a>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="signup-image">
-                <a href="/">
-                  <img src="img/side2.jpg"  alt="Shopping Site" />
-                </a>
-                <div class="text-center mt-2">
-                  <a href="/login" class="sign-in-link"
-                    >Already registered? Log in</a
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  .signup-image a:hover {
+    color: #ddd;
+  }
+
+  .error-message {
+    color: #ff7f7f;
+    font-size: 0.75rem;
+    margin-top: 5px;
+  }
+
+  .alert-danger {
+    font-size: 0.85rem;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* semi-transparent black */
+  z-index: -1;
+  }
+</style>
+
+<body>
+  <div class="overlay"></div>
+  <div class="card">
+    <h3 class="card-title text-white">Sign Up</h3>
+    <form id="signform" method="post" action="/signup">
+      <div class="form-group">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" />
+        <div id="error1" class="error-message"></div>
       </div>
-    </div>
-    <div class="spacer"></div>
-    <%- include("../../views/partials/user/footer") %>
-  </body>
+
+      <div class="form-group">
+        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" />
+        <div id="error2" class="error-message"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number" />
+        <div id="error3" class="error-message"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" />
+        <div id="error4" class="error-message"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="password" class="form-control" id="confirm-password" name="confirmPassword" placeholder="Confirm Password" />
+        <div id="error5" class="error-message"></div>
+      </div>
+
+      <% if (locals.message && message.length > 0) { %>
+      <div class="alert alert-danger text-center">
+        <%= message %>
+      </div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">Sign Up</button>
+
+      <div class="social-btns mt-3">
+  <a href="/auth/google" class="google-auth-btn">
+    <img src="img/Google-Symbol.jpg" alt="Google Logo" />
+    <span>Google</span>
+  </a>
+</div>
+
+      <div class="signup-image">
+        <a href="/login">Already registered? Log in</a>
+      </div>
+    </form>
+  </div>
+</body>
+
 </html>
 
 <script>
