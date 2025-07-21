@@ -5,15 +5,11 @@
     padding: 0;
     background-color: #f4f4f4;
   }
-
-  /* Full-width container with extra horizontal padding */
   .main-container {
     width: 100%;
     padding: 20px 40px;
     background-color: #fafafa;
   }
-
-  /* Shop Topbar remains unchanged except minor spacing tweaks */
   .shop-topbar {
     display: flex;
     justify-content: space-between;
@@ -82,8 +78,6 @@
   .sort-dropdown:hover {
     border-color: #dc3545;
   }
-
-  /* Increased gap between sidebar and product grid */
   .product-list-container {
     display: flex;
     gap: 50px;
@@ -335,7 +329,7 @@
   right: 12px;
   cursor: pointer;
   font-size: 22px;
-  color: black; /* Default color */
+  color: black;
   background: white;
   padding: 8px;
   border-radius: 50%;
@@ -344,17 +338,17 @@
   }
 
 .wishlist-icon:hover {
-  background: rgba(255, 255, 255, 0.8); /* Slight background change on hover */
+  background: rgba(255, 255, 255, 0.8); 
 }
 
 .product-card:hover .wishlist-icon {
-  transform: none; /* Prevents unwanted movement */
-  opacity: 1; /* Ensures it remains visible */
+  transform: none;
+  opacity: 1; 
 }
 
 
   .wishlist-icon.active i {
-  color: red; /* Change to red when active */
+  color: red; 
 }
 
 .cart-btn {
@@ -369,7 +363,7 @@
     cursor: pointer;
     text-align: center;
     transition: all 0.3s ease;
-    text-decoration: none; /* Ensures it's styled properly even for <a> tags */
+    text-decoration: none; 
 }
 
 .cart-btn:hover {
@@ -432,14 +426,14 @@
 }
 
 .product-name a {
-    color: rgb(72, 77, 225) !important; /* Change 'red' to any color you want */
-    text-decoration: none; /* Removes the underline */
+    color: rgb(72, 77, 225) !important;
+    text-decoration: none; 
 }
 
 .filter-checkbox {
-  width: 14px; /* Adjust the size */
+  width: 14px;
   height: 14px;
-  transform: scale(0.8); /* Optionally scale down */
+  transform: scale(0.8); 
 }
 .apply-filters-btn {
     background-color: #b02a37;
@@ -457,7 +451,7 @@
 .sort-dropdown {
     padding: 6px 12px;
     font-size: 15px;
-    border: 1.5px solid #ff4500; /* Hot Wheels vibe */
+    border: 1.5px solid #ff4500; 
     border-radius: 5px;
     background-color: #fff;
     color: #333;
@@ -480,18 +474,33 @@
   <div class="main-container">
     <section class="shop-page">
       <div class="shop-topbar">
-        <form action="" method="GET" class="search-form" id="searchForm" style="display: flex; align-items: center;">
-          <input type="text" name="search" id="searchInput" value="<%= query.search %>" placeholder="Search products..." class="search-input" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px 0 0 8px; outline: none; flex: 1;">
-          
-          <button type="submit" class="search-button" style="background-color: #a8323e; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Search</button>
-        
-          <% if(query.search) { %>
-            <button type="button" class="clear-button" onclick="clearSearch()" title="Clear search"
-            style="background-color: white; color: black; border: 1px solid #ccc; padding: 10px 16px; border-left: none; border-radius: 0 8px 8px 0; cursor: pointer; font-size: 16px;">
-            ✖
-          </button>
-          <% } %>
-        </form>
+        <form method="GET" id="searchForm" class="search-form" style="display: flex; align-items: center;">
+  <!-- Search Input -->
+  <input type="text" name="search" id="searchInput" value="<%= query.search %>" placeholder="Search products..." class="search-input" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px 0 0 8px; outline: none; flex: 1;" />
+
+  <!-- Submit Button -->
+  <button type="submit" class="search-button" style="background-color: #a8323e; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Search</button>
+
+  <!-- Clear Button -->
+  <% if(query.search) { %>
+    <button type="button" class="clear-button" onclick="clearSearch()" title="Clear search"
+      style="background-color: white; color: black; border: 1px solid #ccc; padding: 10px 16px; border-left: none; border-radius: 0 8px 8px 0; cursor: pointer; font-size: 16px;">
+      ✖
+    </button>
+  <% } %>
+
+  <!-- Preserve Filters When Searching -->
+  <% if (query.category) { %>
+    <input type="hidden" name="category" value="<%= query.category %>">
+  <% } %>
+  <% if (query.brand) { %>
+    <input type="hidden" name="brand" value="<%= query.brand %>">
+  <% } %>
+  <% if (query.price) { %>
+    <input type="hidden" name="price" value="<%= query.price %>">
+  <% } %>
+</form>
+
         
         
         <form action="/shop" method="GET" id="sortForm">

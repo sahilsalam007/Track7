@@ -1,5 +1,6 @@
 const User=require("../../models/userSchema");
-const Wishlist=require("../../models/wishlistSchema")
+const Wishlist=require("../../models/wishlistSchema");
+const Cart = require("../../models/cartSchema");
 
 
 const getWishlist = async (req, res) => {
@@ -22,11 +23,12 @@ const getWishlist = async (req, res) => {
     }
 };
 
+
 const addToWishlist=async(req,res)=>{
     try {
         const productId=req.body.productId;
         const userId=req.session.user;
-
+        
         let wishlist=await Wishlist.findOne({userId:userId});
         if(!wishlist){
             wishlist=new Wishlist({
@@ -47,7 +49,8 @@ const addToWishlist=async(req,res)=>{
         console.error("Error adding to wishlist:",error);
         return res.status(500).json({success:false,message:"Server error"});
     }
-}
+};
+
 
 const removeWishlist=async(req,res)=>{
     try {
@@ -63,7 +66,8 @@ const removeWishlist=async(req,res)=>{
         console.error("Error removing from wishlist:",error);
         res.json({success:false});
     }
-}
+};
+
 
 module.exports={
     getWishlist,

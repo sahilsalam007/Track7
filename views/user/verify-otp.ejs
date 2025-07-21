@@ -147,6 +147,7 @@
     document.getElementById("otp").focus();
 
     let timer = 60;
+        let isExpired = false;
     let timerInterval;
     const resendButton = document.getElementById("resend-otp");
 
@@ -160,12 +161,21 @@
                 document.getElementById("timerValue").classList.add("expired");
                 document.getElementById("timerValue").textContent = "Expired";
                 resendButton.disabled = false;
+                isExpired = true;
             }
         }, 1000);
     }
     startTimer();
 
     function validateOTPForm(){
+        if (isExpired) {
+        Swal.fire({
+            icon: "warning",
+            title: "OTP Expired",
+            text: "Please click on 'Resend OTP' to get a new one."
+        });
+        return false;
+    }
         const otpInput=document.getElementById("otp").value;
         $.ajax({
             type:"POST",
@@ -205,8 +215,10 @@
         resendButton.disabled = true;
         clearInterval(timerInterval);
         timer=60;
+        isExpired = false;
         
-        document.getElementById("timerValue").classList.remove("expired")
+        document.getElementById("timerValue").classList.remove("expired");
+        document.getElementById("timerValue").textContent = timer; 
         startTimer();
         $.ajax({
          type:"POST",

@@ -100,6 +100,10 @@ router.get("/order-failed",userAuth,orderController.loadOrderFailed);
 router.post("/create-failed-order",userAuth,orderController.createFailedOrder);
 router.get("/failed-orders",userAuth,orderController.getFailedOrders);
 
+//referal
+router.get("/referal", userController.referal);
+
+
 // router.get("/retry-payment/:orderId",userAuth,orderController.loadRetryPayments);
 // router.get("/retry-payment/:orderId/pay",userAuth,orderController.createRetryRazorpayOrder);
 // router.get("/retry-payment/:orderId/verify",userAuth,orderController.verifyRetryPayment);

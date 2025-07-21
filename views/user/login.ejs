@@ -117,11 +117,25 @@
         }
 
         .error-message {
-        color: red;
-        font-size: 0.75rem;
-        display: none;
-        text-align: center;
-      }
+          color: red;
+          font-size: 13px;
+          margin-left: 20px;
+          margin-top: -10px;
+          margin-bottom: 10px;
+          display: none;
+          font-weight: 600;
+        }
+        .server-error-message {
+          color: rgb(67, 8, 8);
+          text-align: center;
+          margin-bottom: 15px;
+          font-weight: 600;
+          background-color: #a1a1a1;
+          padding: 10px;
+          border: 1px solid rgb(0, 0, 0);
+          border-radius: 10px;
+        }
+
 
   .social-btns{
     text-align: center;
@@ -149,22 +163,24 @@
 <body>
     <form id="loginform" class="login-part" method="post" action="/login">
         <!-- <div class="logo"></div> -->
+         <% if (typeof message !== "undefined" && message) { %>
+         <div class="server-error-message"><%= message %></div>
+         <% } %>
+
         <div class="title">Log In</div>
         <div class="fields">
             <div class="username">
-                <svg class="svg-icon" viewBox="0 0 20 20">
-                    <path d="M12.075,10.812..."></path>
-                </svg>
-                <input type="email" class="user-input" name="email" id="email" placeholder="Enter email">
-                <div id="error1" class="error-message"></div>
+              <svg class="svg-icon" viewBox="0 0 20 20">...</svg>
+              <input type="email" name="email" id="email" placeholder="Enter email">
+              <div id="error1" class="error-message"></div>
             </div>
+            
             <div class="password">
-                <svg class="svg-icon" viewBox="0 0 20 20">
-                    <path d="M17.308,7.564..."></path>
-                </svg> 
-                <input type="password" class="pass-input" name="password" id="password" placeholder="Password">
-                <div id="error2" class="error-message"></div>
+              <svg class="svg-icon" viewBox="0 0 20 20">...</svg>
+              <input type="password" name="password" id="password" placeholder="Password">
+              <div id="error2" class="error-message"></div>
             </div>
+
         </div>
         <button type="submit" class="login-button">Log In</button>
         <div class="social-btns">
@@ -210,14 +226,38 @@
                 error2.innerHTML = "";
             }
         }
-        
-        loginform.addEventListener("submit", function (e) {
-            emailValidateChecking();
-            passValidateChecking();
-            if (error1.innerHTML || error2.innerHTML) {
-                e.preventDefault();
-            }
-        });
+loginform.addEventListener("submit", function (e) {
+    let valid = true;
+
+    const emailval = emailid.value.trim();
+    const emailpattern = /^[a-zA-Z0-9._-]+@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
+
+    if (!emailpattern.test(emailval)) {
+        error1.style.display = "block";
+        error1.innerText = "Please enter a valid email address (e.g., abc@example.com)";
+        valid = false;
+    } else {
+        error1.style.display = "none";
+        error1.innerText = "";
+    }
+
+    const passval = passid.value;
+    if (passval.length < 8) {
+        error2.style.display = "block";
+        error2.innerText = "Password must be at least 8 characters long";
+        valid = false;
+    } else {
+        error2.style.display = "none";
+        error2.innerText = "";
+    }
+
+    if (!valid) {
+        e.preventDefault();
+    }
+});
+
+
+            
     </script>
 </body>
 </html>

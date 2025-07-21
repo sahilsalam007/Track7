@@ -468,7 +468,7 @@ async function initiateRazorpayPayment(userId) {
                         cancelButtonText: "Cancel"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            initiateRazorpayPayment(userId); // Retry the same order creation
+                            initiateRazorpayPayment(userId); 
                         } else {
                             window.location.href = "/order-failed";
                         }
@@ -483,7 +483,7 @@ async function initiateRazorpayPayment(userId) {
                         cancelButtonText: "Cancel"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            initiateRazorpayPayment(userId); // Retry the same order creation
+                            initiateRazorpayPayment(userId); 
                         } else {
                             window.location.href = `/checkout?userId=${userId}`;
                         }
@@ -499,7 +499,7 @@ async function initiateRazorpayPayment(userId) {
                     cancelButtonText: "Cancel"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        initiateRazorpayPayment(userId); // Retry the same order creation
+                        initiateRazorpayPayment(userId); 
                     } else {
                         location.reload();
                     }
@@ -518,7 +518,7 @@ async function initiateRazorpayPayment(userId) {
             cancelButtonText: "Cancel"
         }).then((result) => {
             if (result.isConfirmed) {
-                initiateRazorpayPayment(userId); // Retry the same order creation
+                initiateRazorpayPayment(userId); 
             } else {
                 window.location.href = "/order-failed";
             }
@@ -650,6 +650,29 @@ function editAddress(index, id, name, addressType, city, landMark, state, pincod
 document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    const fields = ["name", "addressType", "city", "landMark", "state", "pincode", "phone"];
+    let isValid = true;
+
+    fields.forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        if (input.value.trim() === "") {
+            isValid = false;
+            input.classList.add("is-invalid");
+        } else {
+            input.classList.remove("is-invalid");
+        }
+    });
+
+    if (!isValid) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: 'Please fill out all fields properly. No field can be empty or just spaces.',
+            confirmButtonColor: '#d33'
+        });
+        return;
+    }
+
     const formData = new FormData(this);
     const formObject = {};
     formData.forEach((value, key) => { formObject[key] = value; });
@@ -665,14 +688,29 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
 
         const result = await response.json();
         if (result.success) {
-            alert(result.message);
-            location.reload();
+            Swal.fire({
+                icon: "success",
+                title: result.message || "Address saved successfully!",
+                confirmButtonColor: "#3085d6"
+            }).then(() => {
+                location.reload();
+            });
         } else {
-            alert(result.message);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: result.message || "Something went wrong.",
+                confirmButtonColor: "#d33"
+            });
         }
     } catch (error) {
         console.error("Error saving address:", error);
-        alert("Failed to save address.");
+        Swal.fire({
+            icon: "error",
+            title: "Server Error",
+            text: "Unable to process the request. Please try again later.",
+            confirmButtonColor: "#d33"
+        });
     }
 });
 
@@ -686,7 +724,6 @@ document.querySelectorAll('.address-card').forEach(card => {
     });
 });
 
-// Coupon
 let appliedCouponCode = null;
 async function applyCoupon(couponName, offerPrice, minimumPrice, totalPrice) {
     const couponCode = couponName;
@@ -773,6 +810,8 @@ function showCouponMessage(message, color) {
     messageElement.style.display = "block";
     setTimeout(() => messageElement.style.display = "none", 3000);
 }
+
+
 </script>
 
 

@@ -161,6 +161,7 @@
   <div class="card">
     <h3 class="card-title text-white">Sign Up</h3>
     <form id="signform" method="post" action="/signup">
+      <input type="hidden" name="referralCode" id="referralCode" />
       <div class="form-group">
         <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" />
         <div id="error1" class="error-message"></div>
@@ -213,6 +214,14 @@
 <script>
       
     document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const referralCode = urlParams.get("ref");
+      if(referralCode){
+        const referralInput = document.getElementById("referralCode");
+        if(referralInput){
+          referralInput.value = referralCode;
+        }
+      }
         const nameid = document.getElementById("name");
         const emailid = document.getElementById("email");
         const phoneid = document.getElementById("phone");
@@ -264,7 +273,14 @@
                 error3.style.display = "block";
                 error3.innerHTML = "Enter a valid phone number";
                 return false;
-            } else if (phoneval.length !== 10) {
+                
+            } 
+            else if (/^0{10}$/.test(phoneval)) {
+                   error3.style.display = "block";
+                   error3.innerHTML = "Phone number cannot be all zeroes";
+                   return false;
+                 } 
+            else if (phoneval.length !== 10) {
                 error3.style.display = "block";
                 error3.innerHTML = "Phone number must be 10 digits";
                 return false;

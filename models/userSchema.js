@@ -21,6 +21,7 @@ const userSchema=new Schema({
     googleId:{
         type:String,
         unique:true,
+        sparse:true,
     },
     password:{
         type:String,
@@ -53,11 +54,24 @@ const userSchema=new Schema({
         type:Date,
         default:Date.now
     },
-    referalCode:{
-        type:String
+    referralCode: {
+        type: String,
+        unique: true,
+        default: function () {
+          const namePart = this.name ? this.name.substring(0, 3).toUpperCase() : "USR";
+          const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+          return `${namePart}${randomPart}`;
+  }
+}
+,
+    referredBy: {
+        type: mongoose.Types.ObjectId,
+        ref :"User",
+        default : null,
     },
     redeemed:{
-        type:Boolean
+        type:Boolean,
+        default:false
     },
     redeemedUsers:[{
         type:Schema.Types.ObjectId,
