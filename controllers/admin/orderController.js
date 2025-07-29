@@ -142,11 +142,8 @@ const approveItemReturn = async (req, res) => {
         if (item.productStatus !== 'Return Request') {
             return res.status(400).json({ success: false, message: 'Item is not in Return Request status' });
         }
-
-        // Update item status
         item.productStatus = 'Returned';
 
-        // Refund logic
         if (order.payment.method === 'razorpay' || order.payment.method === 'wallet') {
             let wallet = await Wallet.findOne({ userId: order.userId });
             if (!wallet) {
@@ -164,15 +161,12 @@ const approveItemReturn = async (req, res) => {
 
             await wallet.save();
         }
-
-        // Restock the product
         const product = await Product.findById(item.product);
         if (product) {
             product.quantity += item.quantity;
             await product.save();
         }
 
-        // Update order status
         const allItemsReturnedOrCancelled = order.orderedItems.every(item => item.productStatus === 'Returned' || item.productStatus === 'Cancelled');
         order.status = allItemsReturnedOrCancelled ? 'returned' : 'return-requested';
 

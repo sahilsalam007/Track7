@@ -649,6 +649,12 @@ const cancelOrder = async (req, res) => {
         }
 
         findOrder.orderedItems[itemIndex].productStatus = "Cancelled";
+
+             const activeItems = findOrder.orderedItems.filter(item=>item.productStatus !== "Cancelled");
+             const newTotalPrice = activeItems.reduce((sum,item) => sum + item.price * item.quantity ,0);
+             findOrder.totalPrice = newTotalPrice;
+             findOrder.finalAmount = newTotalPrice - (findOrder.discount || 0)
+            //   findOrder.grandTotal = newSubTotal + (findOrder.shippingCharge || 0);
         await findOrder.save();
 
         return res.status(200).json({ message: "Item cancelled successfully" });
@@ -834,12 +840,8 @@ const returnOrder = async (req, res) => {
         if (item.productStatus === 'Returned' || item.productStatus === 'Return Request') {
             return res.status(400).json({ success: false, message: 'Item already requested for return or returned' });
         }
-
-        // Update item status and reason
         item.productStatus = 'Return Request';
         item.returnReason = returnReason;
-
-        // Update order status to return-requested only if necessary
         if (order.orderedItems.some(item => item.productStatus === 'Return Request')) {
             order.status = 'return-requested';
         }

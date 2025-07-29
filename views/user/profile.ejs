@@ -240,9 +240,11 @@
                          <p><%=address.altPhone%></p>
                       
                          <div class="d-flex justify-content-between">
-                           <a href="/editAddress?id=<%=address._id%>" class="btn-small">Edit</a>
-                           <a href="/deleteAddress?id=<%=address._id%>" class="btn-small" onclick="return confirm('Are you sure you want to delete this address?')">Delete</a>
+                           <a href="/editAddress?id=<%= address._id %>" class="btn-small">Edit</a>
+                         
+                           <a href="javascript:void(0)" class="btn-small" onclick="confirmDelete('<%= address._id %>')">Delete</a>
                          </div>
+
                         
                        </div>
                      </div>
@@ -383,7 +385,22 @@
    </div>
  </section>
 </main>
-<script>
+            <script>
+              function confirmDelete(id) {
+                Swal.fire({
+                  title: 'Are you sure?',
+                  text: "You won't be able to undo this!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#6c757d',
+                  confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = `/deleteAddress?id=${id}`;
+                  }
+                });
+              }
 document.addEventListener("DOMContentLoaded", function () {
     let ordersTab = document.getElementById("orders-tab");
     if (ordersTab) {

@@ -82,7 +82,7 @@ const getCheckOut = async (req, res) => {
         }
         
         const taxAmount = totalPrice * 0.10;
-        let coupons = await Coupon.find();
+        const coupons = await Coupon.find({isList:true,expireOn:{$gte:currentDate}})
 
         res.status(200).render('checkout', {
             cart,

@@ -228,13 +228,14 @@ const changeQuantity = async (req, res) => {
                     }
                 }
             ]);
-
+            const remainingStock = findProduct.quantity - newQuantity;
             res.json({
                 status: true,
                 quantityInput: newQuantity,
                 count: count,
                 totalAmount: newQuantity * (findProduct.salesPrice || 0),
-                grandTotal: grandTotal[0]?.totalPrice || 0
+                grandTotal: grandTotal[0]?.totalPrice || 0,
+                remainingStock: remainingStock
             });
         } else {
             res.status(400).json({ status: false, error: "Cart not updated" });

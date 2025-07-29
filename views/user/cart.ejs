@@ -190,72 +190,79 @@
         </div>
 
         <section class="mt-5 mb-5">
-            <div class="container">
-                <div class="cart-container">
-                    <div class="cart-items">
-                        <h3 class="mb-4">Your Cart</h3>
-                        <% if (data.length > 0) { %>
-                            <% for (let i = 0; i < data.length; i++) { %>
-                                <div class="cart-card">
-                                    <img src="/uploads/re-image/<%= data[i].productImage %>" alt="Product Image" />
-        
-                                    <div class="product-details">
-                                        <h5><%= data[i].productName %></h5>
-                                        <p><%= data[i].brand %></p>
-                                        <p class="price">₹<span id="subTotal<%= i %>">
-                                            <%= data[i].salePrice * data[i].quantity %>
-                                        </span></p>
-                                    </div>
-        
-                                    <div class="quantity-control">
-                                        <button 
-                                            onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, -1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
-                                            -
-                                        </button>
-                                        <input id="cartProductQuantity<%= i %>" value="<%= data[i].quantity %>" readonly>
-                                        <button 
-                                            onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, 1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
-                                            +
-                                        </button>
-                                    </div>
-                                    
-                                    
-                                     
-                                    <button class="remove-btn" onclick="confirmRemove('<%= data[i].productId %>')">Remove</button>
-                                </div>
-                            <% } %>
-                        <% } else { %>
-                            <div class="cart-card">
-                                <p class="lead mb-0">No items found in Cart</p>
+    <div class="container">
+        <div class="cart-container">
+            <div class="cart-items">
+                <h3 class="mb-4">🛒 Your Cart</h3>
+                <% if (data.length > 0) { %>
+                    <% for (let i = 0; i < data.length; i++) { %>
+                        <div class="cart-card">
+                            <img src="/uploads/re-image/<%= data[i].productImage %>" alt="Product Image" />
+
+                            <div class="product-details">
+                                <h5><%= data[i].productName %></h5>
+                                <p><%= data[i].brand %></p>
+
+                                <p class="text-muted" id="stockText<%= i %>">
+                                     In stock: <%= data[i].productTotalQuantity - data[i].quantity %>
+                                </p>
+
+                                <p class="price">
+                                    ₹<%= data[i].salePrice %> × 
+                                    <span id="qtyText<%= i %>"><%= data[i].quantity %></span> = 
+                                    ₹<span id="subTotal<%= i %>">
+                                        <%= data[i].salePrice * data[i].quantity %>
+                                    </span>
+                                </p>
                             </div>
-                        <% } %>
-                        <a href="/shop" class="go-back-btn">Go Back to Shopping</a>
-                    </div>
-                    <div class="cart-summary">
-                        <div class="cart-summary-card">
-                            <h4>PRICE DETAILS</h4>
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <td class="cart_total_label">Shipping</td>
-                                        <td class="cart_total_amount">Free Shipping</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart_total_label">Total</td>
-                                        <td class="cart_total_amount text-primary font-lg fw-900">
-                                            <text id="total">
-                                                <%= grandTotal %>
-                                            </text>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="/checkout?userId=<%= user._id %>" class="btn btn-primary">Proceed To Checkout</a>
+
+                            <div class="quantity-control">
+                                <button 
+                                    onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, -1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
+                                    -
+                                </button>
+                                <input id="cartProductQuantity<%= i %>" value="<%= data[i].quantity %>" readonly>
+                                <button 
+                                    onclick="changeQuantity('<%= data[i].productId %>', <%= data[i].quantity %>, 1, <%= data[i].salePrice %>, <%= i %>, <%= data[i].productTotalQuantity %>)">
+                                    +
+                                </button>
+                            </div>
+
+                            <button class="remove-btn" onclick="confirmRemove('<%= data[i].productId %>')">Remove</button>
                         </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="cart-card">
+                        <p class="lead mb-0">No items found in Cart</p>
                     </div>
+                <% } %>
+                <a href="/shop" class="go-back-btn">Go Back to Shopping</a>
+            </div>
+
+            <div class="cart-summary">
+                <div class="cart-summary-card">
+                    <h4>PRICE DETAILS</h4>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="cart_total_label">Shipping</td>
+                                <td class="cart_total_amount">Free Shipping</td>
+                            </tr>
+                            <tr>
+                                <td class="cart_total_label">Total</td>
+                                <td class="cart_total_amount text-primary font-lg fw-900">
+                                    ₹<text id="total"><%= grandTotal %></text>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a href="/checkout?userId=<%= user._id %>" class="btn btn-primary">Proceed To Checkout</a>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
+
         
     </main>
 
@@ -310,6 +317,20 @@ $.ajax({
             cartProductQuantityElement.value = response.quantityInput;
             subtotalElement.textContent = `₹${response.totalAmount}`;
             grandTotalElement.textContent = `₹${response.grandTotal}`;
+            
+            const qtyTextElement = document.querySelector(`#qtyText${productIndex}`);
+            if(qtyTextElement){
+                qtyTextElement.textContent = response.quantityInput;
+            }
+            const stockElement = document.querySelector(`#stockText${productIndex}`);
+            if(stockElement){
+                stockElement.textContent = `In stock: ${response.remainingStock}`;
+            }
+
+            const plusBtn = cartProductQuantityElement.parentElement.querySelector("button:last-of-type");
+        if (plusBtn) {
+            plusBtn.disabled = response.quantityInput >= productTotalQuantity || response.quantityInput >= 5;
+        }
         } else {
             Swal.fire({ title: 'Error', text: response.error || 'Something went wrong.', icon: 'error' });
         }
