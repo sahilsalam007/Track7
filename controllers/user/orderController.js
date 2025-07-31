@@ -654,7 +654,6 @@ const cancelOrder = async (req, res) => {
              const newTotalPrice = activeItems.reduce((sum,item) => sum + item.price * item.quantity ,0);
              findOrder.totalPrice = newTotalPrice;
              findOrder.finalAmount = newTotalPrice - (findOrder.discount || 0)
-            //   findOrder.grandTotal = newSubTotal + (findOrder.shippingCharge || 0);
         await findOrder.save();
 
         return res.status(200).json({ message: "Item cancelled successfully" });
