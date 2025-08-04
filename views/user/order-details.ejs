@@ -346,7 +346,7 @@
                     <% } %>
                     <div class="detail-item total-price">
                         <span>Final Amount:</span>
-                        <span>₹<%= ((order.finalAmount * 1.1) + (order.discount * 0.1)).toFixed(2) %></span>
+                        <span>₹<%= order.finalAmount.toFixed(2) %></span>
 
                     </div>
                 </div>

@@ -227,7 +227,7 @@
                         <td>#${order.orderId}</td>
                         <td>${order.user.name}</td>
                         <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-                        <td>₹${order.totalPrice.toFixed(2)}</td>
+                        <td>₹${order.finalAmount.toFixed(2)}</td>
                         <td>${order.payment?.method}</td>
                         <td>
                                  <span class="badge ${order.status === 'Delivered' ? 'bg-success' : 

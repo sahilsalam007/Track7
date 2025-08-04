@@ -29,8 +29,6 @@ const generateOrderId = async () => {
 
 const orderPlaced = async (req, res) => {
     try {
-        console.log("User in request:", req.user);
-        console.log("Session user:", req.session.user);
 
         const { totalPrice, addressId, paymentMethod } = req.body;
         const normalPaymentMethod = paymentMethod.toLowerCase();
@@ -58,7 +56,6 @@ const orderPlaced = async (req, res) => {
 
         const user = await User.findOne({ _id:userId }).populate('cart.productId');
         const cart =user.cart;
-        console.log("working here",cart);
 
         if (!cart || cart.length === 0) {
             return res.status(400).json({ error: "Your cart is empty." });
@@ -91,7 +88,6 @@ const orderPlaced = async (req, res) => {
                 await product.save();
             }
         }
-        console.log("Coupon Discount Stored in Session:", req.session.appliedCoupon);
         const finalAmount= totalPrice - discount;
         if(normalPaymentMethod === "cod" && finalAmount > 1000){
             return res.status(400).json({success:false, message:"COD not allows orders above  rs 1000"})
@@ -146,7 +142,6 @@ const createRazorpayOrder = async (req, res) => {
     try {
         const { userId, couponCode, taxAmount = 0 } = req.body;
 
-        console.log("sahil dataaaaaaaaaaaaaaaaaa",req.body.couponCode)
         
 
         const user = await User.findById(userId).populate("cart.productId");
@@ -163,14 +158,10 @@ const createRazorpayOrder = async (req, res) => {
         let discount = 0;
         if (couponCode) {
             const coupon = await Coupon.findOne({ name: couponCode.trim() }); // preshnam 
-            console.log("haaii",coupon)
             if (coupon) discount = coupon.offerPrice;
-            console.log(discount);
         }
-        console.log("total discount is",discount)
 
         const finalAmount = totalPrice + taxAmount - discount;
-         console.log(finalAmount)
         const response = await razorpay.orders.create({
             amount: (finalAmount * 100), 
             currency: "INR",
@@ -202,9 +193,9 @@ const verifyRazorpayPayment = async (req, res) => {
             razorpay_signature,
             userId,
             addressId,
+            taxAmount,
             totalPrice
         } = req.body;
-            console.log(req.body)
         const isValid = verifySignature(
             razorpay_order_id, 
             razorpay_payment_id, 
@@ -252,7 +243,7 @@ const verifyRazorpayPayment = async (req, res) => {
         if(req.session.appliedCoupon && typeof req.session.appliedCoupon.discount === "number"){
             discount =  req.session.appliedCoupon.discount;
         }
-         const finalAmount = totalPrice - discount;
+         const finalAmount = totalPrice - discount + taxAmount;
          const orderId = await generateOrderId();
          const newOrder = new Order({
             orderId,
@@ -343,12 +334,10 @@ const getFailedOrders=async(req,res)=>{
      
 
 const createFailedOrder = async (req, res) => {
-    console.log('is working')
     try {
         const { userId, addressId, totalPrice, discount, paymentMethod, razorpayPaymentId, razorpayOrderId } = req.body;
 
         const sample=await Cart.find({userId:userId})
-        console.log(sample)
         
         const user = await User.findById(userId).populate('cart.productId');
         const cart=user.cart;
@@ -417,7 +406,6 @@ const createFailedOrder = async (req, res) => {
         await order.save();
         
 
-        console.log("Order created with status 'Failed' due to payment failure.",order);
 
         return res.json({ success: true, orderId: order._id });
 
@@ -448,7 +436,6 @@ const viewOrders = async (req, res) => {
         .populate("address")
         .skip(skip)
         .limit(limit)
-      console.log(orders)
         res.status(200).render("orders",{orders,totalPages,currentPage:page})
     } catch (error) {
         console.error("Error fetching orders:", error);
@@ -465,7 +452,6 @@ const downloadInvoice = async (req, res, next) => {
       .populate('orderedItems.product')
       .populate('userId');
 
-        console.log("download invoice orderDetails",orderDetails.createdAt);
 
 
       const doc = new PDFDocument({
@@ -540,17 +526,20 @@ const downloadInvoice = async (req, res, next) => {
       doc.fillColor('#000000')
       let yPosition = tableTop + 10
   
-      orderDetails.orderedItems.forEach((item, index) => {
-        doc
-          .font('Helvetica')
-          .fontSize(12)
-          .text(item?.product?.productName, 50, yPosition)
-          .text(item.quantity.toString(), 300, yPosition)
-          .text(`Rs.${item?.price}`, 400, yPosition)
-          .text(`Rs.${item?.price * item.quantity}`, 500, yPosition)
-  
-        yPosition += 40
-      })
+      orderDetails.orderedItems
+  .filter(item => item.productStatus !== "Cancelled")
+  .forEach((item, index) => {
+    doc
+      .font('Helvetica')
+      .fontSize(12)
+      .fillColor('#000000')
+      .text(item?.product?.productName, 50, yPosition)
+      .text(item.quantity.toString(), 300, yPosition)
+      .text(`Rs.${item?.price}`, 400, yPosition)
+      .text(`Rs.${item?.price * item.quantity}`, 500, yPosition);
+
+    yPosition += 40;
+});
 
       doc
         .moveTo(40, 430)
@@ -563,7 +552,7 @@ const downloadInvoice = async (req, res, next) => {
         .text('Payment Method:', 40, yPosition + 20)
         .font('Helvetica')
         .fontSize(12)
-        .text(`Payment Method: ${orderDetails.payment.method==="cod"?"Cash on Delivery":orderDetails.paymentMethod==="razorpay"?"Online":"Wallet"}`, 40, yPosition + 40)
+        .text(`Payment Method: ${orderDetails.payment.method==="cod"?"Cash on Delivery":orderDetails.payment.method==="razorpay"?"Online":"Wallet"}`, 40, yPosition + 40)
         .text(`Payment Status: ${orderDetails.payment.status}`, 40, yPosition + 60)
 
       doc
@@ -598,12 +587,8 @@ const downloadInvoice = async (req, res, next) => {
 
 const cancelOrder = async (req, res) => {
     try {
-        console.log('from cancel', req.body);
         const { orderId, itemId } = req.body;
         const userId = req.session.user;
-
-        console.log('Order ID:', orderId);
-        console.log('User ID:', userId);
 
         const findUser = await User.findById(userId);
         if (!findUser) return res.status(404).json({ message: 'User not found' });
@@ -624,11 +609,11 @@ const cancelOrder = async (req, res) => {
 
         console.log("Cancelling item:", cancelledItem);
         console.log(findOrder.payment.method)
+        const refundAmount = cancelledItem.price * cancelledItem.quantity;
         if (findOrder.payment.method === 'razorpay' || findOrder.payment.method === 'wallet') {
             let wallet = await Wallet.findOne({ userId });
             if (!wallet) wallet = new Wallet({ userId, balance: 0, transactions: [] });
 
-            const refundAmount = cancelledItem.price * cancelledItem.quantity;
             console.log("Refund Amount:", refundAmount);
 
             wallet.balance += refundAmount;
@@ -649,11 +634,8 @@ const cancelOrder = async (req, res) => {
         }
 
         findOrder.orderedItems[itemIndex].productStatus = "Cancelled";
-
-             const activeItems = findOrder.orderedItems.filter(item=>item.productStatus !== "Cancelled");
-             const newTotalPrice = activeItems.reduce((sum,item) => sum + item.price * item.quantity ,0);
-             findOrder.totalPrice = newTotalPrice;
-             findOrder.finalAmount = newTotalPrice - (findOrder.discount || 0)
+             console.log("final amount",findOrder.finalAmount)
+             findOrder.finalAmount-=refundAmount
         await findOrder.save();
 
         return res.status(200).json({ message: "Item cancelled successfully" });
@@ -667,14 +649,12 @@ const cancelOrder = async (req, res) => {
 
 const walletPayment = async (req, res) => {
     try {
-        console.log("wallet working")
         const userId = req.session.user;
         let discount = 0
         if(req.session.appliedCoupon && typeof req.session.appliedCoupon.discount === 'number'){
             discount =  req.session.appliedCoupon.discount;
         }
         const { totalPrice, addressId, paymentMethod} = req.body;
-        console.log(req.body)
         if (!userId) {
             return res.status(401).json({ success: false, message: "Please log in" });
         }
@@ -691,7 +671,6 @@ const walletPayment = async (req, res) => {
 
         const user = await User.findOne({ _id:userId }).populate('cart.productId');
         const cart =user.cart;
-        console.log("working here",cart);
 
         if (!cart || cart.length === 0) {
             return res.status(400).json({ error: "Your cart is empty." });
@@ -731,8 +710,6 @@ const walletPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Wallet not found" });
         }
 
-        console.log("balance",wallet.balance)
-        console.log("Wallet balance:", wallet.balance, "Requested amount:", totalPrice);
 
         if (wallet.balance < totalPrice) {
             return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
@@ -804,7 +781,6 @@ const getOrderDetails = async (req,res) => {
             return res.status(404).json({message:'users order not found'})
         }
 
-        console.log(order)
         
         res.status(200).render('order-details',{order})
 
@@ -820,10 +796,8 @@ const returnOrder = async (req, res) => {
     const { returnReason } = req.body;
 
     try {
-        console.log('Received orderId:', orderId, 'itemId:', itemId);
         const order = await Order.findOne({ orderId: orderId.trim() });
         if (!order) {
-            console.log('Orders in DB:', await Order.find({}, { orderId: 1, _id: 1 }));
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
@@ -847,7 +821,6 @@ const returnOrder = async (req, res) => {
 
         await order.save();
 
-        console.log(`Product [${itemId}] from Order [${order.orderId}] marked as Return Request`);
 
         return res.status(200).json({ success: true, message: 'Return request submitted successfully' });
     } catch (error) {

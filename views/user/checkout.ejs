@@ -364,7 +364,7 @@ async function initiateRazorpayPayment(userId) {
     const addressId = selectedAddress.dataset.addressId;
     const totalPrice = parseFloat(document.getElementById('totalPriceValue').value);
     const discount = parseFloat(document.getElementById('discountValue')?.value || 0);
-
+    console.log("total price",totalPrice)
     console.log("Selected Address ID:", addressId);
 
     try {
@@ -401,6 +401,7 @@ async function initiateRazorpayPayment(userId) {
                         body: JSON.stringify({
                             addressId: addressId,
                             totalPrice: totalPrice,
+                            taxAmount:parseFloat(document.getElementById("taxAmountValue").value),
                             userId: userId,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
