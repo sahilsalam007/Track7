@@ -445,7 +445,7 @@ const viewOrders = async (req, res) => {
 };
 
 
-const downloadInvoice = async (req, res, next) => {
+const downloadInvoice = async (req, res, next) => {q
     try {
       const { orderId } = req.params
       const orderDetails = await Order.findById(orderId)
