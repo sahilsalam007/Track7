@@ -531,18 +531,23 @@
           <a href="/shop" class="clear-filter-btn">Clear All Filters</a>
         
           <!-- Categories Filter -->
-          <div class="filter-section">
-            <h3 class="filter-title">Categories</h3>
-            <div class="filter-items">
-              <% categories.forEach(category => { %>
-                <div class="filter-item">
-                  <input type="checkbox" class="filter-checkbox" name="category" value="<%= category._id %>"
-                    <% if (query.category && query.category.includes(category._id)) { %> checked <% } %> />
-                  <label><%= category.name %></label>
-                </div>
-              <% }) %>
-            </div>
-          </div>
+
+              <div class="filter-section">
+                <h3 class="filter-title">Categories</h3>
+                    <div class="filter-items">
+                      <% categories.forEach(category => { %>
+                        <div class="filter-item">
+                          <input type="checkbox" class="filter-checkbox" name="category" value="<%= category._id %>"
+                            <% if (query.category && query.category.includes(category._id)) { %> checked <% } %> />
+                          <label>
+                            <%= category.name.length > 14 ? category.name.substring(0, 14) + '...' : category.name %>
+                          </label>
+                        </div>
+                      <% }) %>
+                    </div>
+                  </div>
+
+
         
           <!-- Brands Filter -->
           <div class="filter-section">

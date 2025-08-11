@@ -99,21 +99,33 @@
     }
   </style>
 </head>
-<body>
-  <section class="content-main">
-    <div class="content-header">
-      <div>
-        <h2 class="content-title card-title">Category</h2>
-      </div>
-    </div>
-    <header class="card-header text-center mb-20">
-      <form action="/admin/category/" method="get" class="d-inline" novalidate >
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
-          <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search"/>
-          <button class="btn" type="submit">Search</button>
-        </div>
-      </form>
-    </header>
+       <body>
+         <section class="content-main">
+           <div class="content-header">
+             <div>
+               <h2 class="content-title card-title">Category</h2>
+             </div>
+           </div>
+           <header class="card-header text-center mb-4">
+         <form action="/admin/category/" method="get" class="d-inline-block w-100" style="max-width: 500px; margin: auto;" novalidate>
+           <div class="input-group input-group-sm shadow-sm rounded">
+       
+             <input 
+               type="text" 
+               class="form-control border-0" 
+               placeholder="Search categories..."
+               name="search"
+               value="<%= typeof search !== 'undefined' ? search : '' %>"
+               style="padding-left: 15px;"
+             >
+             <button class="btn btn-primary px-3" type="submit">Search</button>
+             <a href="/admin/category" class="btn btn-outline-secondary clear-btn px-3 d-flex align-items-center justify-content-center">
+               Clear
+             </a>
+           </div>
+         </form>
+       </header>
+       
     <div class="card">
       <div class="card-body">
         <div class="row">
@@ -464,6 +476,16 @@ async function removeOffer(categoryId){
         console.log("Error removing Offer",error)
     }
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const categoryTextElements = document.querySelectorAll("td.text-start");
+
+    categoryTextElements.forEach(el => {
+        const text = el.textContent.trim();
+        if (text.length > 14) {
+            el.textContent = text.substring(0, 14) + "...";
+        }
+    });
+});
 
 
 </script>

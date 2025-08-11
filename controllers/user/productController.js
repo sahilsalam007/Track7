@@ -1,9 +1,8 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
-const Brand = require('../../models/brandSchema')
-const Wishlist = require("../../models/wishlistSchema")
-
+const Brand = require("../../models/brandSchema");
+const Wishlist = require("../../models/wishlistSchema");
 
 const productDetails = async (req, res) => {
   try {
@@ -24,7 +23,8 @@ const productDetails = async (req, res) => {
     let wishlistItems = [];
     if (userId) {
       const wishlist = await Wishlist.findOne({ userId });
-      wishlistItems = wishlist?.products?.map(item => item.productId.toString()) || [];
+      wishlistItems =
+        wishlist?.products?.map((item) => item.productId.toString()) || [];
     }
 
     res.render("product-details", {
@@ -33,15 +33,13 @@ const productDetails = async (req, res) => {
       quantity: product.quantity,
       category: findCategory,
       relatedProducts,
-      wishlistItems
+      wishlistItems,
     });
-
   } catch (error) {
     console.error("Error for fetching product details", error);
     res.redirect("/pageNotFound");
   }
 };
-
 
 module.exports = {
   productDetails,

@@ -1,101 +1,130 @@
-const mongoose=require("mongoose");
-const {Schema}=mongoose;
-const {v4:uuidv4}=require("uuid");
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const { v4: uuidv4 } = require("uuid");
 
-const orderSchema=new Schema({
-    orderId:{
-        type:String,
-        required:true,
-        unique:true
-    },
-    userId: {
+const orderSchema = new Schema({
+  orderId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  orderedItems: [
+    {
+      product: {
         type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    },
-    orderedItems:[{
-     product:{
-        type:Schema.Types.ObjectId,
-        ref:"Product",
-        required:true
-     },
-     quantity:{
-        type:Number,
-        required:true
-     },
-     price:{
-        type:Number,
-        default:0
-     },
-     productStatus:{
-        type:String,
-        enum:['Confirmed','Processing','Shipped','Delivered','Cancelled','Return Request','Returned','Pending'],
-        default:'Confirmed'
-    },
-     returnReason: {
+        ref: "Product",
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        required: true,
+      },
+      price: {
+        type: Number,
+        default: 0,
+      },
+      productStatus: {
         type: String,
-        default: null
-    }
-    }],
-    totalPrice:{
-        type:Number,
-        required:true
-    },
-    discount:{
-        type:Number,
-        default:0
-    },finalAmount:{
-        type:Number,
-        required:true
-    },
-    address: { 
-        addressType: String,
-        name: String,
-        city: String,
-        landMark: String,
-        state: String,
-        pincode: Number,
-        phone: String,
-        altPhone: String
-    },
-    invoiceDate:{
-        type:Date
-    },
-   
-    createdOn:{
-        type:Date,
-        default:Date.now,
-        required:true
-    },
-    couponApplied:{
-        type:Boolean,
-        default:false
-    },
-    payment: {
-        method: {
-            type: String,
-            enum: ["cod", "razorpay","wallet"],
-            default: "cod"
-        },
-        status: {
-            type: String,
-            enum: ["Pending", "Paid", "Failed", "refunded", "processing", "Processing"], 
-            default: "Pending"
-        },
-        razorpayDetails: {
-            paymentId: String,
-            orderId: String,
-            signature: String
-        }
-    },
-    status: {   
+        enum: [
+          "Confirmed",
+          "Processing",
+          "Shipped",
+          "Delivered",
+          "Cancelled",
+          "Return Request",
+          "Returned",
+          "Pending",
+        ],
+        default: "Confirmed",
+      },
+      returnReason: {
         type: String,
-        enum: ["Pending", "confirmed", "Processing", "Shipped", "Delivered", "Cancelled", "return-requested", "returned","Failed"],
-        default: "pending"
+        default: null,
+      },
     },
-    returnReason: {
-    type: String
-}
-})
-const Order=mongoose.model("Order",orderSchema);
-module.exports=Order;
+  ],
+  totalPrice: {
+    type: Number,
+    required: true,
+  },
+  discount: {
+    type: Number,
+    default: 0,
+  },
+  finalAmount: {
+    type: Number,
+    required: true,
+  },
+  address: {
+    addressType: String,
+    name: String,
+    city: String,
+    landMark: String,
+    state: String,
+    pincode: Number,
+    phone: String,
+    altPhone: String,
+  },
+  invoiceDate: {
+    type: Date,
+  },
+
+  createdOn: {
+    type: Date,
+    default: Date.now,
+    required: true,
+  },
+  couponApplied: {
+    type: Boolean,
+    default: false,
+  },
+  payment: {
+    method: {
+      type: String,
+      enum: ["cod", "razorpay", "wallet"],
+      default: "cod",
+    },
+    status: {
+      type: String,
+      enum: [
+        "Pending",
+        "Paid",
+        "Failed",
+        "refunded",
+        "processing",
+        "Processing",
+      ],
+      default: "Pending",
+    },
+    razorpayDetails: {
+      paymentId: String,
+      orderId: String,
+      signature: String,
+    },
+  },
+  status: {
+    type: String,
+    enum: [
+      "Pending",
+      "confirmed",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+      "return-requested",
+      "returned",
+      "Failed",
+    ],
+    default: "pending",
+  },
+  returnReason: {
+    type: String,
+  },
+});
+const Order = mongoose.model("Order", orderSchema);
+module.exports = Order;

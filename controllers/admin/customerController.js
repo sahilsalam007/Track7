@@ -34,7 +34,8 @@ const customerInfo=async(req,res)=>{
              res.status(200).render("customers", { 
                 data: userData, 
                 totalPages: totalPages, 
-                currentPage: page 
+                currentPage: page ,
+                search : search
             });
     }
     catch(error){

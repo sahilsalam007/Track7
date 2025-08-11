@@ -34,6 +34,19 @@
         .pagination .page-item.active .page-link {
             background-color: #343a40;
             border-color: #343a40;
+        }    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-1px);
+        }
+    
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-1px);
+        }
+    
+        input:focus {
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -44,12 +57,18 @@
 </div>
 <header class="card-header text-center mb-20">
     <form action="" method="get" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands" name="search">
-            <button class="btn  border-0" type="submit">Search</button>
+        <div class="input-group input-group-sm border border-1 border-grey rounded" style="width: 500px; margin-left: 230px; box-shadow: 0px 2px 6px rgba(0,0,0,0.1);">
+            <input type="text" class="form-control border-0" placeholder="Search products or brands" name="search" id="searchInput">
+            <button class="btn btn-primary" type="submit" style="min-width: 80px; font-weight: 500; transition: background 0.3s;">
+                Search
+            </button>
+            <button class="btn btn-outline-danger" type="button" id="clearBtn" style="min-width: 80px; font-weight: 500; transition: all 0.3s;">
+                Clear
+            </button>
         </div>
     </form>
 </header>
+
 <div class="right mt-5">
     <table class="table table-striped">
         <thead>
@@ -203,5 +222,11 @@
             Swal.fire("Error","An unexpected error occured","error");
         }
     }
+
+document.getElementById('clearBtn').addEventListener('click', function () {
+    document.getElementById('searchInput').value = '';
+    this.closest('form').submit();
+});
+
 </script>
 <%- include("../../views/partials/admin/footer") %>

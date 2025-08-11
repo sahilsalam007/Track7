@@ -1,5 +1,78 @@
 <%- include("../../views/partials/admin/header") %>
+<style>
 
+.input-group {
+    border-radius: 50px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+.input-group .form-control {
+    border: none;
+    background-color: #f8f9fa;
+    box-shadow: none;
+}
+
+.input-group .btn {
+    border-radius: 0;
+}
+
+
+.clear-btn:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+.btn-danger {
+    border-radius: 20px;
+}
+
+.btn-success {
+    border-radius: 20px;
+}
+
+
+.pagination .page-link {
+    border-radius: 50px !important;
+    padding: 6px 14px;
+    margin: 0 3px;
+    color: #333;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+}
+
+</style>
 <div class="content-header row">
     <div class="d-flex justify-content-between align-items-center">
         <h2 class="content-title card-title">Customers</h2>
@@ -8,13 +81,25 @@
 </div>
 
 <header class="card-header text-center mb-4">
-    <form action="/admin/users/" method="get" class="d-inline">
-        <div class="input-group input-group-sm border rounded-pill shadow-sm" style="width: 500px; margin: auto;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search customers..." name="search">
-            <button class="btn btn-primary rounded-pill px-3" type="submit">Search</button>
+    <form action="/admin/users/" method="get" class="d-inline-block w-100" style="max-width: 500px; margin: auto;">
+        <div class="input-group input-group-sm shadow-sm rounded">
+
+            <input 
+                type="text" 
+                class="form-control border-0" 
+                placeholder="Search customers..."
+                name="search"
+                value="<%= typeof search !== 'undefined' ? search : '' %>"
+                style="padding-left: 15px;"
+            >
+            <button class="btn btn-primary px-3" type="submit">Search</button>
+              <a href="/admin/users" class="btn btn-outline-secondary clear-btn px-3 d-flex align-items-center justify-content-center">
+                  Clear
+              </a>
         </div>
     </form>
 </header>
+
 
 <div class="container mt-4">
     <table class="table table-hover text-center shadow-sm rounded overflow-hidden">

@@ -165,10 +165,20 @@
     </div>
 
     <header class="card-header text-center mb-20">
-        <form action="/admin/orders/" method="get" class="d-inline">
-            <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px; margin-top: 50px;">
-                <input type="text" class="form-control border-0 rounded-pill" placeholder="Search customers..." name="search" id="search-order">
-                <button   class="btn  border-0" type="submit">Search</button>
+        <form onsubmit="event.preventDefault(); fetchOrders();" class="d-inline">
+            <div class="input-group border border-1 border-secondary shadow-sm overflow-hidden" style="width: 450px; margin: 40px auto;">
+                <input type="text" 
+                       class="form-control border-0 ps-4 py-2 " 
+                       placeholder="Search customers..." 
+                       name="search" 
+                       id="search-order"
+                       style="background-color: #f8f9fa; font-size: 15px;"
+                       value="<%= typeof search !== 'undefined' ? search : '' %>">
+                <button class="btn btn-primary px-4" type="submit" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">Search</button>
+                <button type="button" 
+                        class="btn btn-outline-danger px-4" 
+                        onclick="clearSearch()" 
+                        style="border-top-right-radius: 0; border-bottom-right-radius: 0;">Clear</button>
             </div>
         </form>
     </header>
@@ -331,6 +341,11 @@
     }
            
  }
+
+     function clearSearch() {
+        document.getElementById('search-order').value = '';
+        window.location.href = '/admin/orders';
+    }
     </script>
 
    
