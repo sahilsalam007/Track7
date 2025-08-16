@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
 const couponSchema = new mongoose.Schema({
   name: {

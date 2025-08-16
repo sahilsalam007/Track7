@@ -2,8 +2,6 @@ const User = require("../../models/userSchema");
 const nodemailer = require("nodemailer");
 const Address = require("../../models/addressSchema");
 const bcrypt = require("bcrypt");
-const env = require("dotenv").config();
-const session = require("express-session");
 const Wallet = require("../../models/walletSchema");
 
 function generateOtp() {
@@ -44,12 +42,12 @@ const sendVerificationEmail = async (email, otp) => {
   }
 };
 
-const securePassword = async (password) => {
+const securePassword = async (password,) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
-    res.redirect("/pageNotFound");
+    console.error("Error", error);
   }
 };
 
@@ -57,6 +55,7 @@ const getForgotPassPage = async (req, res) => {
   try {
     res.render("forgot-password");
   } catch (error) {
+    console.error("Error forgot password", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -85,6 +84,7 @@ const forgotEmailValid = async (req, res) => {
       });
     }
   } catch (error) {
+    console.error("Error forgot email", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -98,6 +98,8 @@ const verifyForgotPassOtp = async (req, res) => {
       res.json({ success: false, message: "OTP not matching" });
     }
   } catch (error) {
+    console.error(" Error verifying forgot password", error);
+    
     res
       .status(500)
       .json({ success: false, message: "An error occured. Please try again" });
@@ -108,6 +110,7 @@ const getResetPassPage = async (req, res) => {
   try {
     res.render("reset-password");
   } catch (error) {
+    console.error("Error reset password", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -146,6 +149,7 @@ const postNewPassword = async (req, res) => {
       res.render("reset-password", { message: "Passwords do not match" });
     }
   } catch (error) {
+    console.error("Error posting new password", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -180,6 +184,7 @@ const changeEmail = async (req, res) => {
     const user = await User.findOne({ _id: req.session.user });
     res.render("change-email", { user });
   } catch (error) {
+    console.error("Error changing email", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -207,6 +212,7 @@ const changeEmailValid = async (req, res) => {
       });
     }
   } catch (error) {
+    console.error("Error change email validation", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -226,6 +232,7 @@ const verifyEmailOtp = async (req, res) => {
       });
     }
   } catch (error) {
+    console.error("Error", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -237,6 +244,7 @@ const updateEmail = async (req, res) => {
     await User.findByIdAndUpdate(userId, { email: newEmail });
     res.redirect("/userProfile");
   } catch (error) {
+    console.error("Error", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -246,6 +254,7 @@ const changePassword = async (req, res) => {
     const user = await User.findOne({ _id: req.session.user });
     res.render("change-password", { user });
   } catch (error) {
+    console.error("Error", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -290,6 +299,7 @@ const verifyChangePassOtp = async (req, res) => {
       res.json({ success: false, message: "OTP not matching" });
     }
   } catch (error) {
+    console.error("Error", error);
     res
       .status(500)
       .json({
@@ -304,6 +314,7 @@ const addAddress = async (req, res) => {
     const user = req.session.user;
     res.render("add-address", { user: user });
   } catch (error) {
+    console.error("Error", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -387,7 +398,6 @@ const postEditAddress = async (req, res) => {
   try {
     const data = req.body;
     const addressId = req.query.id;
-    const user = req.session.user;
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
       res.redirect("/pageNotFound");

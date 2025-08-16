@@ -53,6 +53,7 @@ const addCategory = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Category added successfully" });
   } catch (error) {
+    console.log("Error while adding category",error);
     return res.status(500).json({
       success: false,
       error: "Internal Server error",
@@ -120,6 +121,7 @@ const removeCategoryOffer = async (req, res) => {
     await category.save();
     res.json({ status: true });
   } catch (error) {
+    console.log("Error while removing category offer",error);
     res.status(500).json({ status: false, message: "Internal Server Error" });
   }
 };
@@ -130,6 +132,7 @@ const getListCategory = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: false } });
     res.status(200).redirect("/admin/category");
   } catch (error) {
+    console.log("Error while listing category",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -140,6 +143,7 @@ const getUnlistCategory = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: true } });
     res.status(200).redirect("/admin/category");
   } catch (error) {
+    console.log("Error while unlisting category",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -150,6 +154,7 @@ const getEditCategory = async (req, res) => {
     const category = await Category.findOne({ _id: id });
     res.status(200).render("edit-category", { category: category });
   } catch (error) {
+    console.log("Error while editing Category",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -184,6 +189,7 @@ const editCategory = async (req, res) => {
 
     res.json({ success: true, message: "Category updated successfully!" });
   } catch (error) {
+    console.log("Error while editing category",error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

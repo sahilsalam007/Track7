@@ -1,6 +1,4 @@
 const Order = require("../../models/orderSchema");
-const PDFDocument = require("pdfkit");
-const fs = require("fs");
 const ExcelJS = require("exceljs");
 
 const getSalesReport = async (req, res) => {
@@ -147,7 +145,7 @@ const getSalesReport = async (req, res) => {
   }
 };
 
-const downloadPDF = async (req, res, next) => {
+const downloadPDF = async (req, res) => {
   try {
     let { day, startDate, endDate } = req.query;
     let query = { "payment.status": "Paid" };

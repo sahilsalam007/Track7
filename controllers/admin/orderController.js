@@ -1,7 +1,6 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Order = require("../../models/orderSchema");
-const mongoose = require("mongoose");
 const Wallet = require("../../models/walletSchema");
 
 const getorderDetails = async (req, res) => {

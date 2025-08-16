@@ -20,6 +20,7 @@ const loadCoupon = async (req, res) => {
       totalPages,
     });
   } catch (error) {
+    console.log("Error while loading coupon",error);
     return res.status(500).redirect("/pageerror");
   }
 };
@@ -43,6 +44,7 @@ const createCoupon = async (req, res) => {
     await newCoupon.save();
     return res.status(201).redirect("/admin/coupon");
   } catch (error) {
+    console.log("Error while creating a coupon",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -55,6 +57,7 @@ const editCoupon = async (req, res) => {
       findCoupon: findCoupon,
     });
   } catch (error) {
+    console.log("Error while editing a coupon",error);
     return res.status(500).redirect("/pageerror");
   }
 };
@@ -87,6 +90,7 @@ const updateCoupon = async (req, res) => {
       }
     }
   } catch (error) {
+    console.log("Error while updating coupon",error);
     return res.status(500).redirect("/pageerror");
   }
 };

@@ -1,15 +1,13 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
-const mongoose = require("mongoose");
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Cart = require("../../models/cartSchema");
 const Razorpay = require("razorpay");
 const Wallet = require("../../models/walletSchema");
 const Coupon = require("../../models/couponSchema");
-const crypto = require("crypto");
 require("dotenv").config();
-const { razorpayInstance, verifySignature } = require("../../config/razorPay");
+const { verifySignature } = require("../../config/razorPay");
 const PDFDocument = require("pdfkit");
 
 const generateOrderId = async () => {
@@ -90,12 +88,10 @@ const orderPlaced = async (req, res) => {
     }
     const finalAmount = totalPrice - discount;
     if (normalPaymentMethod === "cod" && finalAmount > 1000) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "COD not allows orders above  rs 1000",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "COD not allows orders above  rs 1000",
+      });
     }
 
     const orderId = await generateOrderId();
@@ -129,13 +125,11 @@ const orderPlaced = async (req, res) => {
 
     await newOrder.save();
     await User.updateOne({ _id: userId }, { $set: { cart: [] } });
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Order placed successfully!",
-        order: newOrder,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Order placed successfully!",
+      order: newOrder,
+    });
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -312,7 +306,10 @@ const loadOrderSuccess = async (req, res) => {
 const loadOrderFailed = async (req, res) => {
   try {
     res.render("order-failed");
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error fetching failed orders:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 };
 
 const getFailedOrders = async (req, res) => {
@@ -338,7 +335,6 @@ const createFailedOrder = async (req, res) => {
   try {
     const {
       userId,
-      addressId,
       totalPrice,
       discount,
       paymentMethod,
@@ -346,7 +342,6 @@ const createFailedOrder = async (req, res) => {
       razorpayOrderId,
     } = req.body;
 
-    const sample = await Cart.find({ userId: userId });
 
     const user = await User.findById(userId).populate("cart.productId");
     const cart = user.cart;
@@ -375,22 +370,18 @@ const createFailedOrder = async (req, res) => {
     });
 
     if (existingFailedOrder) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "A failed order for this payment already exists.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "A failed order for this payment already exists.",
+      });
     }
 
     if (outOfStockItems.length > 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Some items are out of stock.",
-          outOfStockItems,
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Some items are out of stock.",
+        outOfStockItems,
+      });
     }
 
     const selectedAddress = await Address.findOne({ userId });
@@ -455,18 +446,15 @@ const viewOrders = async (req, res) => {
     res.status(200).render("orders", { orders, totalPages, currentPage: page });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res
-      .status(500)
-      .render("orders", {
-        user: req.session.user,
-        orders: [],
-        error: "Failed to fetch orders.",
-      });
+    res.status(500).render("orders", {
+      user: req.session.user,
+      orders: [],
+      error: "Failed to fetch orders.",
+    });
   }
 };
 
-const downloadInvoice = async (req, res, next) => {
-  q;
+const downloadInvoice = async (req, res) => {
   try {
     const { orderId } = req.params;
     const orderDetails = await Order.findById(orderId)
@@ -555,7 +543,7 @@ const downloadInvoice = async (req, res, next) => {
 
     orderDetails.orderedItems
       .filter((item) => item.productStatus !== "Cancelled")
-      .forEach((item, index) => {
+      .forEach((item) => {
         doc
           .font("Helvetica")
           .fontSize(12)
@@ -854,24 +842,20 @@ const returnOrder = async (req, res) => {
     }
 
     if (item.productStatus !== "Delivered") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Only delivered orders can be returned",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Only delivered orders can be returned",
+      });
     }
 
     if (
       item.productStatus === "Returned" ||
       item.productStatus === "Return Request"
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Item already requested for return or returned",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Item already requested for return or returned",
+      });
     }
     item.productStatus = "Return Request";
     item.returnReason = returnReason;
@@ -883,12 +867,10 @@ const returnOrder = async (req, res) => {
 
     await order.save();
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Return request submitted successfully",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Return request submitted successfully",
+    });
   } catch (error) {
     console.error("Return order error:", error);
     return res

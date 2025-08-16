@@ -52,6 +52,7 @@ const customerBlocked=async (req,res)=>{
         
         res.status(200).redirect("/admin/users");
     }catch(error){
+        console.log("Error while blocking a customer",error);
         res.status(500).redirect("/pageerror")
     }
 };
@@ -63,6 +64,7 @@ const customerBlocked=async (req,res)=>{
         await User.updateOne({_id:id},{$set:{isBlocked:false}});
         res.status(200).redirect("/admin/users")
     }catch(error){
+        console.log("Error while unBlocking a customer",error);
         res.status(500).redirect("/pageerror")
     }
 };

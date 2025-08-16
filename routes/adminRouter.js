@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const adminController=require("../controllers/admin/adminController");
-const {userAuth,adminAuth,isSessionAdmin}=require("../middlewares/auth");
+const {adminAuth,isSessionAdmin}=require("../middlewares/auth");
 const customerController=require("../controllers/admin/customerController");
 const categoryController=require("../controllers/admin/categoryController");
 const orderController=require("../controllers/admin/orderController");

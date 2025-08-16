@@ -2,7 +2,6 @@ const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
-const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Wishlist = require("../../models/wishlistSchema");
@@ -13,6 +12,7 @@ const pageNotFound = async (req, res) => {
   try {
     res.render("page-404");
   } catch (error) {
+    console.log("Error",error);
     res.redirect("/pageNotFound");
   }
 };
@@ -35,7 +35,7 @@ const loadHomepage = async (req, res) => {
       return res.render("home", { products: productData });
     }
   } catch (error) {
-    console.log("Home page not found");
+    console.log("Home page not found",error);
     res.status(500).send("server error");
   }
 };
@@ -237,6 +237,7 @@ const loadLogin = async (req, res) => {
       res.redirect("/");
     }
   } catch (error) {
+    console.log("error",error)
     res.redirect("/pageNotFound");
   }
 };
@@ -264,7 +265,7 @@ const login = async (req, res) => {
   }
 };
 
-const logout = (async = (req, res) => {
+const logout = async  (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
@@ -277,7 +278,7 @@ const logout = (async = (req, res) => {
     console.log("Logout error", error);
     res.redirect("/pageNotFound");
   }
-});
+};
 
 const loadShoppingPage = async (req, res) => {
   try {

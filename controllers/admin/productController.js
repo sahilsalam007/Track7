@@ -1,7 +1,6 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
-const User = require("../../models/userSchema");
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -15,6 +14,7 @@ const getProductAddPage = async (req, res) => {
       brand: brand,
     });
   } catch (error) {
+    console.log("Error while adding a product",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -121,6 +121,7 @@ const getAllProducts = async (req, res) => {
       res.status(404).render("page-404");
     }
   } catch (error) {
+    console.log("Error in get all products",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -210,6 +211,7 @@ const blockProduct = async (req, res) => {
     await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.status(200).redirect("/admin/products");
   } catch (error) {
+    console.log("error in blockProducts",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -220,6 +222,7 @@ const unblockProduct = async (req, res) => {
     await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.status(200).redirect("/admin/products");
   } catch (error) {
+    console.log("Error while unblocking product",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -236,6 +239,7 @@ const getEditProduct = async (req, res) => {
       brand: brand,
     });
   } catch (error) {
+    console.log("Error while get edit product",error);
     res.status(500).redirect("pageerror");
   }
 };
@@ -295,6 +299,7 @@ const deleteSingleImage = async (req, res) => {
     const product = await Product.findByIdAndUpdate(productIdToServer, {
       $pull: { productImage: imageNameToServer },
     });
+    console.log(product);
     const imagePath = path.join(
       "public",
       "uploads",
@@ -309,6 +314,7 @@ const deleteSingleImage = async (req, res) => {
     }
     res.send({ status: true });
   } catch (error) {
+    console.log("error in deleting single Image",error);
     res.status(500).redirect("/pageerror");
   }
 };

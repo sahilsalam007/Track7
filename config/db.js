@@ -1,6 +1,6 @@
 // connect a Node.js application to a MongoDB database
 const mongoose=require("mongoose");
-const env =require("dotenv").config();
+require("dotenv").config();
 
 const connectDB=async ()=>{
     try{

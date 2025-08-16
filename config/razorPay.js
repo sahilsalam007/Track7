@@ -1,7 +1,6 @@
-const env = require('dotenv').config()
+ require('dotenv').config()
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-const { configDotenv } = require("dotenv");
 
 
 const razorpayInstance = new Razorpay({

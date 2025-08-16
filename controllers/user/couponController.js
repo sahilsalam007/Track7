@@ -1,5 +1,4 @@
 const Coupon = require("../../models/couponSchema");
-const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 
 const applyCoupon = async (req, res) => {

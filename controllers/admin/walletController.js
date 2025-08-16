@@ -1,6 +1,4 @@
 const Wallet = require("../../models/walletSchema");
-const Order = require("../../models/orderSchema");
-const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 
 const getWallet = async (req, res) => {
@@ -70,8 +68,7 @@ const getWalletDetails = async (req, res) => {
         },
       },
     ]);
-    if (transaction.length === 0) {
-    }
+
     res.render("admin-wallet-details", { transaction: transaction[0] });
   } catch (error) {
     console.error("Error fetching wallet details:", error);

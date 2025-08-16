@@ -1,5 +1,4 @@
 const Brand = require("../../models/brandSchema");
-const Product = require("../../models/productSchema");
 
 const getBrandPage = async (req, res) => {
   try {
@@ -50,6 +49,7 @@ const addBrand = async (req, res) => {
       res.status(201).redirect("/admin/brands");
     }
   } catch (error) {
+    console.log("Error while adding brand",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -60,6 +60,7 @@ const blockBrand = async (req, res) => {
     await Brand.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.status(200).redirect("/admin/brands");
   } catch (error) {
+    console.log("Error while blocking a brand",error);
     res.status(500).redirect("/pageerror");
   }
 };
@@ -70,6 +71,7 @@ const unBlockBrand = async (req, res) => {
     await Brand.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.status(200).redirect("/admin/brands");
   } catch (error) {
+    console.log("Error while unBlocking brand",error);
     res.status(500).redirect("/pageerror");
   }
 };

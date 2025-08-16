@@ -9,7 +9,6 @@ const {userAuth} = require("../middlewares/auth");
 const {session}=require("../middlewares/auth");
 const couponController = require('../controllers/user/couponController')
 const cartController=require("../controllers/user/cartController");
-const Address = require("../models/addressSchema");
 const orderController=require("../controllers/user/orderController");
 const wishlistController=require("../controllers/user/wishlistController");
 const walletController=require("../controllers/user/walletController");

@@ -687,7 +687,6 @@ function editAddress(index, id, name, addressType, city, landMark, state, pincod
 document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Validation rules
     const rules = {
         name: {
             required: "Full name is required."
@@ -718,7 +717,6 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
 
     let isValid = true;
 
-    // Remove all previous error messages
     document.querySelectorAll(".error-message").forEach(el => el.remove());
 
     Object.keys(rules).forEach(fieldId => {
@@ -726,17 +724,14 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
         const value = input.value.trim();
         let errorText = "";
 
-        // Required check
         if (!value) {
             errorText = rules[fieldId].required;
         }
 
-        // Length and regex checks (only if value is not empty)
         if (!errorText && rules[fieldId].regex && !rules[fieldId].regex.test(value)) {
             errorText = rules[fieldId].length;
         }
 
-        // Show error if exists
         if (errorText) {
             isValid = false;
             const errorEl = document.createElement("div");
@@ -748,10 +743,9 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
     });
 
     if (!isValid) {
-        return; // Stop form submission
+        return; 
     }
 
-    // Prepare data
     const formData = new FormData(this);
     const formObject = {};
     formData.forEach((value, key) => { formObject[key] = value; });

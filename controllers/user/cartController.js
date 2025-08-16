@@ -1,6 +1,5 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
-const mongodb = require("mongodb");
 const mongoose = require("mongoose");
 
 const getCartPage = async (req, res) => {
@@ -11,8 +10,7 @@ const getCartPage = async (req, res) => {
     if (!user) {
       return res.status(404).redirect("/pageNotFound");
     }
-    const productIds = user.cart.map((item) => item.productId);
-    const products = await Product.find({ _id: { $in: productIds } });
+
     const oid = new mongoose.Types.ObjectId(id);
 
     let data = await User.aggregate([
@@ -166,6 +164,7 @@ const deleteProduct = async (req, res) => {
     await user.save();
     res.status(200).redirect("/cart");
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).redirect("/pageNotFound");
   }
 };
@@ -261,15 +260,13 @@ const moveAllToCart = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user || user.wishlist.length === 0) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          message: "Wishlist is empty or user not found.",
-        });
+      return res.status(404).json({
+        status: "error",
+        message: "Wishlist is empty or user not found.",
+      });
     }
-    for (let wishlistPorductId of user.wishlist) {
-      const product = await Product.findById(wishlistPorductId).lean();
+    for (let wishlistProductId of user.wishlist) {
+      const product = await Product.findById(wishlistProductId).lean();
       if (!product) {
         continue;
       }
@@ -283,7 +280,7 @@ const moveAllToCart = async (req, res) => {
         await User.findByIdAndUpdate(userId, {
           $addToSet: {
             cart: {
-              productId: wishlistPorductId,
+              productId: wishlistProductId,
               quantity: 1,
             },
           },
@@ -292,7 +289,7 @@ const moveAllToCart = async (req, res) => {
         const productInCart = user.cart[cartIndex];
         if (productInCart.quantity < product.quantity) {
           await User.updateOne(
-            { _id: userId, "cart.productId": wishlistPorductId },
+            { _id: userId, "cart.productId": wishlistProductId },
             { $inc: { "cart.$.quantity": 1 } }
           );
         }
@@ -304,6 +301,7 @@ const moveAllToCart = async (req, res) => {
       .status(200)
       .json({ status: "success", message: "All items moved to cart." });
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ status: "error", message: "Internal server error" });
   }
 };

@@ -1,10 +1,6 @@
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
-const Cart = require("../../models/cartSchema");
 const Coupon = require("../../models/couponSchema");
-const Product = require("../../models/productSchema");
-const mongoose = require("mongoose");
-const { CURSOR_FLAGS } = require("mongodb");
 require("dotenv").config();
 
 const getCheckOut = async (req, res) => {
@@ -68,7 +64,7 @@ const getCheckOut = async (req, res) => {
       user.cart = [];
 
       await user.save();
-
+      console.log(blockedProductNames)
       return res.status(400).render("cart", {
         swal: {
           title: "Blocked Products",
@@ -80,9 +76,10 @@ const getCheckOut = async (req, res) => {
         user,
         data: [],
         grandTotal: 0,
+        
       });
     }
-
+    
     const userAddresses = await Address.findOne({ userId });
     const currentDate = new Date();
     let totalPrice = 0;
